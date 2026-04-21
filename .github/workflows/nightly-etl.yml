@@ -1,0 +1,256 @@
+name: mastr-nightly-etl
+
+# Download the MaStR XML dump, parse to Parquet, build DuckDB, publish a
+# dated GitHub Release. Runs unattended every night at 06:00 UTC (~08:00 CEST,
+# comfortably after BNetzA's 05:00 CET refresh window).
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      tag_override:
+        description: "Release tag (default: data-YYYY-MM-DD UTC)"
+        required: false
+        type: string
+
+permissions:
+  contents: write   # needed for `gh release create/upload`
+  issues: write     # schema-drift issue filing
+
+concurrency:
+  group: mastr-nightly
+  cancel-in-progress: false
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    # 6 h ceiling: BNetzA's CDN throttles per-connection downloads heavily, so
+    # even with 16-way parallel aria2c the full pipeline (download + parse +
+    # duckdb + release upload) needs ~30-90 min. 360 leaves slack for spikes.
+    timeout-minutes: 360
+    # Force unbuffered Python everywhere so log lines appear in GH Actions UI
+    # in real time (block-buffering otherwise hides any heartbeat).
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show runner disk
+        run: df -h
+
+      - name: Free runner disk
+        # Strips ~15 GB of preinstalled cruft so we have headroom for the ZIP
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install ETL
+        run: |
+          python -m pip install -U pip wheel
+          pip install -e etl
+
+      - name: Compute tag
+        id: meta
+        run: |
+          TAG="${{ inputs.tag_override }}"
+          if [ -z "$TAG" ]; then TAG="data-$(date -u +%F)"; fi
+          DAY="$(date -u +%F)"
+          echo "tag=$TAG"  >> "$GITHUB_OUTPUT"
+          echo "day=$DAY"  >> "$GITHUB_OUTPUT"
+
+      - name: Install aria2 (parallel HTTP downloader)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq aria2
+
+      # Cache the daily ZIP. BNetzA refreshes once per night, so within the
+      # same UTC day the file is byte-identical. Saves ~8 min on any retry
+      # of the same day's run, which is cheap insurance for a flaky pipeline.
+      - name: Restore MaStR ZIP cache
+        id: zipcache
+        uses: actions/cache@v4
+        with:
+          path: data/work/mastr-latest.zip
+          key: mastr-zip-${{ steps.meta.outputs.day }}
+
+      - name: Resolve MaStR ZIP URL
+        id: zipurl
+        if: steps.zipcache.outputs.cache-hit != 'true'
+        # Reuse the scraper from mastr_etl.download so URL discovery logic
+        # stays in one place. Logs (info/warn) go to stderr; only the URL is
+        # captured by `$()`.
+        run: |
+          set -euo pipefail
+          URL=$(python -u -c "from mastr_etl.download import _resolve_url; print(_resolve_url(None))")
+          echo "Resolved MaStR ZIP URL: $URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Download MaStR ZIP (aria2c, 16 parallel streams)
+        if: steps.zipcache.outputs.cache-hit != 'true'
+        # aria2c sidesteps BNetzA's per-connection ~370 KB/s throttle by opening
+        # 16 simultaneous range requests against the same URL. Typical speedup
+        # for the Gesamtdatenexport: 5-10x. Summary line every 15 s shows real
+        # speed/ETA in the GH Actions log.
+        run: |
+          set -euo pipefail
+          mkdir -p data/work
+          aria2c \
+            --max-connection-per-server=16 \
+            --split=16 \
+            --min-split-size=10M \
+            --max-tries=5 \
+            --retry-wait=10 \
+            --connect-timeout=30 \
+            --timeout=60 \
+            --console-log-level=info \
+            --summary-interval=15 \
+            --allow-overwrite=true \
+            --auto-file-renaming=false \
+            --check-certificate=true \
+            --dir=data/work \
+            --out=mastr-latest.zip \
+            "${{ steps.zipurl.outputs.url }}"
+          ls -lh data/work/
+          # SHA-256 sidecar so downstream steps + downstream R clients can verify
+          (cd data/work && sha256sum mastr-latest.zip > mastr-latest.zip.sha256)
+          cat data/work/mastr-latest.zip.sha256
+
+      - name: Verify cached ZIP is intact
+        if: steps.zipcache.outputs.cache-hit == 'true'
+        run: |
+          set -euo pipefail
+          ls -lh data/work/
+          # Quick structural check — refuse to proceed with a truncated cache.
+          if ! unzip -tq data/work/mastr-latest.zip > /dev/null; then
+            echo "Cached ZIP is corrupt — clearing and forcing redownload next run"
+            rm -f data/work/mastr-latest.zip
+            exit 1
+          fi
+          echo "Cache hit: reusing $(du -h data/work/mastr-latest.zip | cut -f1) ZIP from earlier run today"
+          (cd data/work && sha256sum mastr-latest.zip > mastr-latest.zip.sha256)
+
+      # Cache the parsed Parquet set keyed by the ZIP's sha256. Same input ZIP
+      # always yields byte-identical Parquets, so on any same-day retry this
+      # saves the ~22-min parse step entirely. The previous step computed the
+      # sha256 sidecar for both fresh-download and cache-hit branches.
+      - name: Compute ZIP sha256 for cache key
+        id: zhash
+        run: |
+          set -euo pipefail
+          HASH=$(awk '{print $1}' data/work/mastr-latest.zip.sha256)
+          echo "sha256=$HASH" >> "$GITHUB_OUTPUT"
+          echo "Parquet cache key: mastr-parquet-$HASH"
+
+      - name: Restore Parquet cache
+        id: pqcache
+        uses: actions/cache@v4
+        with:
+          path: data/parquet
+          key: mastr-parquet-${{ steps.zhash.outputs.sha256 }}
+
+      - name: Parse XML -> Parquet
+        if: steps.pqcache.outputs.cache-hit != 'true'
+        run: python -u -m mastr_etl.parse --in data/work --out data/parquet
+
+      - name: Verify cached Parquet set is intact
+        if: steps.pqcache.outputs.cache-hit == 'true'
+        # If the cache claims to be intact but the directory is empty (rare,
+        # but possible after a partial cache write), fail this step explicitly
+        # so the next run re-parses from scratch instead of feeding empty
+        # parquets into build_duckdb (which would silently produce 0 rows).
+        run: |
+          set -euo pipefail
+          n=$(find data/parquet -name '*.parquet' -type f | wc -l)
+          echo "Cache hit: $n parquet files restored"
+          if [ "$n" -lt 10 ]; then
+            echo "Parquet cache appears truncated ($n files) — failing"
+            exit 1
+          fi
+          du -sh data/parquet
+
+      - name: Free ZIP before DuckDB build
+        run: rm -f data/work/*.zip
+
+      - name: Build DuckDB
+        # Fault-tolerant by design: a missing/corrupt parquet logs a warning
+        # but does not abort. The CHECKPOINT at the end ensures the file is
+        # written even if some entities are absent.
+        run: python -u -m mastr_etl.build_duckdb --parquet data/parquet --out data/mastr.duckdb
+
+      - name: Inspect DuckDB output
+        # Visibility-only step. Belt-and-suspenders: continue-on-error guarantees
+        # a typo in the diagnostic SQL can NEVER kill the pipeline (a previous
+        # version of this step did exactly that). DuckDB's SHOW TABLES already
+        # lists views, so we don't need a separate information_schema query.
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          ls -lh data/mastr.duckdb
+          python -u -c "
+          import duckdb
+          con = duckdb.connect('data/mastr.duckdb', read_only=True)
+          print('--- tables + views (SHOW TABLES) ---')
+          for (t,) in con.execute('SHOW TABLES').fetchall():
+              try:
+                  n = con.execute(f'SELECT COUNT(*) FROM {t}').fetchone()[0]
+                  print(f'  {t:28s} {n:>14,}')
+              except Exception as e:
+                  print(f'  {t:28s} ERROR: {e}')
+          "
+
+      - name: Build aggregates
+        # Fail-soft: per-aggregate try/except inside aggregates.py.
+        run: python -u -m mastr_etl.aggregates --duckdb data/mastr.duckdb --out data/parquet/aggregates
+
+      - name: Schema-drift check
+        id: drift
+        continue-on-error: true
+        run: python -m mastr_etl.schema_diff --parquet data/parquet --snapshot etl/schema_snapshot.json
+
+      - name: Open issue if schema changed
+        if: steps.drift.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "MaStR schema drift detected (${{ steps.meta.outputs.tag }})"
+          content-filepath: schema_diff_report.md
+          labels: schema-drift, needs-triage
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Best-effort upload: individual asset failures are logged + the
+        # pipeline continues, because the parquet files alone are sufficient
+        # for the Shiny apps (they query via DuckDB httpfs). Oversized
+        # DuckDB blobs are auto-split into <name>.partNN chunks.
+        run: |
+          python -u -m mastr_etl.publish \
+            --tag "${{ steps.meta.outputs.tag }}" \
+            --parquet data/parquet \
+            --duckdb data/mastr.duckdb
+
+      - name: Keep only the last 14 releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq 'sort_by(.createdAt) | reverse | .[14:] | .[].tagName' \
+          | while read -r tag; do
+              if [[ "$tag" == data-* ]]; then
+                echo "deleting old release $tag"
+                gh release delete "$tag" --cleanup-tag --yes || true
+              fi
+            done
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### MaStR nightly ETL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: \`${{ steps.meta.outputs.tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Drift: \`${{ steps.drift.outcome }}\`" >> "$GITHUB_STEP_SUMMARY"
+          du -sh data/parquet data/mastr.duckdb 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true

@@ -1,0 +1,55 @@
+Metadata-Version: 2.4
+Name: mastr-etl
+Version: 0.1.0
+Summary: MaStR (Marktstammdatenregister) XML -> Parquet/DuckDB ETL
+Author: mastr-shiny contributors
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: lxml>=5.2
+Requires-Dist: pyarrow>=15.0
+Requires-Dist: duckdb>=0.10
+Requires-Dist: requests>=2.31
+Requires-Dist: tqdm>=4.66
+Requires-Dist: click>=8.1
+Requires-Dist: tenacity>=8.2
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: ruff>=0.5; extra == "dev"
+Requires-Dist: pytest-cov>=5.0; extra == "dev"
+
+# mastr-etl
+
+Python pipeline that turns the BNetzA Marktstammdatenregister XML dump into
+columnar Parquet and a query-ready DuckDB index.
+
+```
+ZIP (~2.8 GB)
+   │  download.py     -- streamed, retried, SHA-256 verified
+   ▼
+*.xml  (~80 files, ~25 GB unpacked)
+   │  parse.py        -- lxml.iterparse, constant memory, per-entity Parquet
+   ▼
+data/parquet/<entity>.parquet     (~1.5 GB total, snappy)
+   │  build_duckdb.py -- views, indices, Bundesland lookups
+   ▼
+data/mastr.duckdb                 (~600 MB)
+   │  aggregates.py   -- pre-rolled small slices for shinylive
+   ▼
+data/parquet/aggregates/*.parquet (~5 MB total)
+   │  publish.py      -- gh release create / upload
+   ▼
+GitHub Release: tag = data-YYYY-MM-DD
+```
+
+Designed to run unattended in `ubuntu-latest` (~25 min, fits in 14 GB
+ephemeral disk by streaming and immediately deleting source XML once each
+entity is parsed).
+
+## Local dev
+
+```bash
+make venv install
+make all      # download + parse + duckdb + aggregates  (~30 min, ~5 GB peak disk)
+make test
+```

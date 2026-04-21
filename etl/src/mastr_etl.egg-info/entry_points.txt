@@ -1,0 +1,7 @@
+[console_scripts]
+mastr-aggregates = mastr_etl.aggregates:main
+mastr-build-db = mastr_etl.build_duckdb:main
+mastr-download = mastr_etl.download:main
+mastr-parse = mastr_etl.parse:main
+mastr-publish = mastr_etl.publish:main
+mastr-schema-diff = mastr_etl.schema_diff:main

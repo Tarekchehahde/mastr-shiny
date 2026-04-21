@@ -1,0 +1,3 @@
+{
+  "_comment": "This file is written by mastr-etl schema_diff --update after the first successful parse. It records every XML column seen per entity and is diffed on every run to detect BNetzA schema drift."
+}

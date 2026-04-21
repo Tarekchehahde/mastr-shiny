@@ -1,0 +1,25 @@
+name: mastr-etl-ci
+
+on:
+  push:
+    paths: ["etl/**", ".github/workflows/etl-ci.yml"]
+  pull_request:
+    paths: ["etl/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -U pip wheel
+      - run: pip install -e "etl[dev]"
+      - run: ruff check etl
+      # The build_duckdb smoke test deliberately reproduces the schema-
+      # heterogeneity bug that bit production run #4 (skinny kernkraft).
+      # Running it on every push catches this class of regression in ~10 s
+      # instead of after a 30-minute nightly run.
+      - run: pytest etl/tests -q -v

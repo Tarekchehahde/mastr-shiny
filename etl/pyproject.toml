@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mastr-etl"
+version = "0.1.0"
+description = "MaStR (Marktstammdatenregister) XML -> Parquet/DuckDB ETL"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "mastr-shiny contributors" }]
+dependencies = [
+    "lxml>=5.2",
+    "pyarrow>=15.0",
+    "duckdb>=0.10",
+    "requests>=2.31",
+    "tqdm>=4.66",
+    "click>=8.1",
+    "tenacity>=8.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+    "pytest-cov>=5.0",
+]
+
+[project.scripts]
+mastr-download    = "mastr_etl.download:main"
+mastr-parse       = "mastr_etl.parse:main"
+mastr-build-db    = "mastr_etl.build_duckdb:main"
+mastr-aggregates  = "mastr_etl.aggregates:main"
+mastr-schema-diff = "mastr_etl.schema_diff:main"
+mastr-publish     = "mastr_etl.publish:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
