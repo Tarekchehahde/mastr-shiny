@@ -221,6 +221,32 @@ mastr_disconnect <- function() {
   }
 }
 
+# Bundesland code -> name lookup (mirrors etl/src/mastr_etl/config.py:BUNDESLAND).
+# Keep in sync with the Python side; this is the client-side copy so v_units_all
+# can expose bundesland_name without having to read the server-built duckdb.
+.BUNDESLAND <- c(
+  "1400" = "Schleswig-Holstein",     "1401" = "Hamburg",
+  "1402" = "Niedersachsen",          "1403" = "Bremen",
+  "1404" = "Nordrhein-Westfalen",    "1405" = "Hessen",
+  "1406" = "Rheinland-Pfalz",        "1407" = "Baden-Württemberg",
+  "1408" = "Bayern",                 "1409" = "Saarland",
+  "1410" = "Berlin",                 "1411" = "Brandenburg",
+  "1412" = "Mecklenburg-Vorpommern", "1413" = "Sachsen",
+  "1414" = "Sachsen-Anhalt",         "1415" = "Thüringen",
+  "1416" = "Ausschließliche Wirtschaftszone"
+)
+
+.create_bundesland_lookup <- function(con) {
+  rows <- paste(
+    sprintf("('%s','%s')",
+            names(.BUNDESLAND),
+            gsub("'", "''", unname(.BUNDESLAND))),
+    collapse = ", "
+  )
+  dbExecute(con, "CREATE OR REPLACE TABLE bundesland (code VARCHAR, name VARCHAR)")
+  dbExecute(con, sprintf("INSERT INTO bundesland VALUES %s", rows))
+}
+
 #' Heavy path: create entity views (one per raw Parquet on GitHub Releases)
 #' and the schema-aware v_units_all UNION ALL view. Costs ~20-30 s cold because
 #' DuckDB probes each remote parquet footer over HTTPS to learn the schema.
@@ -236,6 +262,7 @@ mastr_disconnect <- function() {
       e, url)
     try(dbExecute(con, sql), silent = TRUE)
   }
+  .create_bundesland_lookup(con)
   .create_units_view(con)
   .mastr_env$entities_ready <- TRUE
   invisible()
@@ -294,6 +321,7 @@ mastr_disconnect <- function() {
     cols <- .table_columns(con, k)
     if (length(cols) == 0L) next  # remote view never materialised
     eg <- unit_map[[k]]
+    bundesland_expr <- .col_or_null(cols, "Bundesland")
     parts <- c(parts, sprintf("
       SELECT
         '%1$s'                                                     AS source_table,
@@ -302,18 +330,20 @@ mastr_disconnect <- function() {
         %4$s                                                       AS bruttoleistung_kw,
         %5$s                                                       AS nettonennleistung_kw,
         %6$s                                                       AS bundesland_code,
+        bl.name                                                    AS bundesland_name,
         %7$s                                                       AS gemeinde,
         %8$s                                                       AS plz,
         %9$s                                                       AS lon,
         %10$s                                                      AS lat,
         %11$s                                                      AS inbetriebnahme_datum,
         %12$s                                                      AS betriebsstatus
-      FROM %1$s t",
+      FROM %1$s t
+      LEFT JOIN bundesland bl ON bl.code = %6$s",
       k, eg,
       .col_or_null(cols, "EinheitMastrNummer"),
       .col_or_null(cols, "Bruttoleistung",     cast = "DOUBLE"),
       .col_or_null(cols, "Nettonennleistung",  cast = "DOUBLE"),
-      .col_or_null(cols, "Bundesland"),
+      bundesland_expr,
       .col_or_null(cols, "Gemeinde"),
       .col_or_null(cols, "Postleitzahl"),
       .col_or_null(cols, "Laengengrad",        cast = "DOUBLE"),
