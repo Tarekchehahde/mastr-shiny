@@ -19,7 +19,13 @@ Germany's official register of all electricity- and gas-market units.
 | [`.github/workflows/`](.github/workflows/) | Nightly ETL, schema-drift detection, release automation |
 | [`shiny/apps/`](shiny/apps/) | 15+ standalone Shiny dashboards (one folder = one app) |
 | [`shiny/R/`](shiny/R/) | Shared loader (`mastr_data.R`) — reads remote Parquet via DuckDB |
-| [`docs/`](docs/) | Architecture, data schema, autonomy model, run instructions |
+| [`docs/`](docs/) | Documentation, data schema, autonomy model |
+
+**Key docs:**
+- **[`docs/RUN.md`](docs/RUN.md)** — copy-paste launch commands for end users (start here).
+- **[`docs/SOLUTION.md`](docs/SOLUTION.md)** — full architecture, pipeline, data layer, and design decisions.
+- [`docs/DATA_SCHEMA.md`](docs/DATA_SCHEMA.md) — column-level reference.
+- [`docs/AUTONOMY.md`](docs/AUTONOMY.md) — CI state machine.
 
 ---
 
