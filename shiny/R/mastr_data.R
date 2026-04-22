@@ -91,6 +91,10 @@ mastr_con <- function() {
     .resolve_release()
     con <- dbConnect(duckdb::duckdb())
     dbExecute(con, "INSTALL httpfs; LOAD httpfs;")
+    # ICU is needed because some aggregate parquets carry TIMESTAMPTZ columns
+    # (e.g. agg_buildout_monthly). DuckDB's autoloader fails on some networks,
+    # so we install+load eagerly and fall back gracefully if unreachable.
+    try(dbExecute(con, "INSTALL icu; LOAD icu;"), silent = TRUE)
     dbExecute(con, "SET enable_http_metadata_cache=true;")
     dbExecute(con, "SET http_keep_alive=true;")
     .create_remote_views(con)
