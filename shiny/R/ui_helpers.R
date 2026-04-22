@@ -43,6 +43,13 @@ mastr_page <- function(title, subtitle = NULL, ...,
     tags$style(HTML("
       .mastr-footer { font-size: 0.75rem; color: #6b7280; padding: 0.5rem 0; }
       .mastr-kpi { font-variant-numeric: tabular-nums; }
+      .value-box { min-height: 130px; }
+      .value-box .value-box-title { font-size: 0.85rem; opacity: 0.9;
+                                    white-space: nowrap; overflow: hidden;
+                                    text-overflow: ellipsis; }
+      .value-box .value-box-value { font-size: 1.75rem; line-height: 1.1;
+                                    white-space: nowrap; overflow: hidden;
+                                    text-overflow: ellipsis; }
       .value-box h3 { font-variant-numeric: tabular-nums; }
     ")),
     div(class = "py-2",
@@ -64,15 +71,22 @@ mastr_footer <- function() {
              target = "_blank", "Source"))
 }
 
-# Shorthand value_box with tabular-numeric formatting
+# Shorthand value_box with tabular-numeric formatting.
+#
+# A fixed min_height is required because page_fillable() otherwise collapses
+# the KPI row when the plots below request more height, which clips the title
+# and caption lines inside the value box.
 mastr_kpi <- function(title, value, subtitle = NULL,
-                      color = "primary", icon = NULL) {
+                      color = "primary", icon = NULL,
+                      min_height = "130px") {
   bslib::value_box(
     title = title,
     value = span(class = "mastr-kpi", value),
     subtitle,
     theme = color,
-    showcase = icon
+    showcase = icon,
+    min_height = min_height,
+    fill = FALSE
   )
 }
 

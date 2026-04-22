@@ -19,6 +19,7 @@ suppressPackageStartupMessages({
   library(DBI)
   library(duckdb)
   library(memoise)
+  library(cachem)
   library(httr2)
   library(rlang)
 })
@@ -31,6 +32,12 @@ suppressPackageStartupMessages({
 .mastr_env$base_url    <- NULL            # e.g. https://github.com/.../releases/download/data-2026-04-21
 .mastr_env$local_db    <- NULL            # optional local .duckdb
 .mastr_env$con         <- NULL
+# Prefetch strategy: download the small (<20 MB total) aggregate parquets to a
+# persistent on-disk cache on first use so charts render from local I/O instead
+# of HTTPS range-requests. Override with MASTR_PREFETCH=0 to force streaming.
+.mastr_env$prefetch    <- !identical(Sys.getenv("MASTR_PREFETCH", "1"), "0")
+.mastr_env$cache_dir   <- NULL            # resolved once tag is known
+.mastr_env$local_aggs  <- character(0)    # names of aggs served from local cache
 
 mastr_set_repo <- function(repo) {
   .mastr_env$repo <- repo
@@ -97,10 +104,84 @@ mastr_con <- function() {
     try(dbExecute(con, "INSTALL icu; LOAD icu;"), silent = TRUE)
     dbExecute(con, "SET enable_http_metadata_cache=true;")
     dbExecute(con, "SET http_keep_alive=true;")
-    .create_remote_views(con)
+    # Fast path: only wire the tiny pre-rolled aggregate parquets (7 files,
+    # total ~300 KB, all cached to local disk). The heavy entity views +
+    # v_units_all are created lazily on first query that references them —
+    # see .ensure_entity_views(). This keeps cold-start under ~2s for any
+    # dashboard that reads aggregates only (01 Overview, 15 EE quote, …).
+    .create_aggregate_views(con)
+    .mastr_env$entities_ready <- FALSE
   }
   .mastr_env$con <- con
   con
+}
+
+#' Resolve (and lazily create) the per-release local cache directory.
+#'
+#' We key the cache on the release tag so a new nightly release automatically
+#' invalidates all cached bytes without the user lifting a finger.
+.cache_dir <- function() {
+  if (!is.null(.mastr_env$cache_dir)) return(.mastr_env$cache_dir)
+  tag <- .mastr_env$release_tag %||% "unknown"
+  # tools::R_user_dir is available since R 4.0; falls back to tempdir in tests.
+  root <- tryCatch(tools::R_user_dir("mastr-shiny", which = "cache"),
+                   error = function(e) file.path(tempdir(), "mastr-shiny-cache"))
+  dir <- file.path(root, tag)
+  dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  .mastr_env$cache_dir <- dir
+  dir
+}
+
+#' Download all aggregate parquets to local disk on first use. Returns a named
+#' list: name -> local path (absolute). Files already present on disk are
+#' reused. If prefetch is disabled or any download fails, that name is missing
+#' from the returned list so the caller falls back to streaming via httpfs.
+.prefetch_aggregates <- function(names) {
+  if (!isTRUE(.mastr_env$prefetch)) return(setNames(vector("list", 0), character()))
+  base <- .mastr_env$base_url
+  dir  <- .cache_dir()
+  out  <- list()
+  total_bytes <- 0
+  started <- Sys.time()
+  for (a in names) {
+    dest <- file.path(dir, paste0(a, ".parquet"))
+    if (file.exists(dest) && file.info(dest)$size > 0) {
+      out[[a]] <- dest
+      next
+    }
+    url <- sprintf("%s/%s.parquet", base, a)
+    ok <- tryCatch({
+      utils::download.file(url, dest, mode = "wb", quiet = TRUE,
+                           method = "libcurl")
+      TRUE
+    }, error = function(e) FALSE, warning = function(w) FALSE)
+    if (ok && file.exists(dest) && file.info(dest)$size > 0) {
+      out[[a]] <- dest
+      total_bytes <- total_bytes + file.info(dest)$size
+    } else {
+      try(file.remove(dest), silent = TRUE)
+    }
+  }
+  .mastr_env$local_aggs <- names(out)
+  if (length(out)) {
+    elapsed <- difftime(Sys.time(), started, units = "secs")
+    message(sprintf("[mastr] cached %d aggregate parquet(s) to %s (%.1f MB in %.1fs)",
+                    length(out), dir, total_bytes / 1e6, as.numeric(elapsed)))
+  }
+  out
+}
+
+#' Manually pre-warm the cache. Useful in a one-shot script before launching a
+#' dashboard. Returns invisibly the list of (name -> path) entries it stored.
+mastr_prefetch <- function(force = FALSE) {
+  .resolve_release()
+  if (force) {
+    dir <- .cache_dir()
+    unlink(list.files(dir, full.names = TRUE), force = TRUE)
+  }
+  mastr_disconnect()      # force re-bind with fresh local paths
+  mastr_con()
+  invisible(.mastr_env$local_aggs)
 }
 
 mastr_disconnect <- function() {
@@ -119,32 +200,63 @@ mastr_disconnect <- function() {
   "marktakteure", "netzanschlusspunkte", "bilanzierungsgebiete", "lokationen"
 )
 
-.create_remote_views <- function(con) {
+#' Create the 7 small aggregate views from local-cached parquet files.
+#' Fast (<1s) because the parquets are <300 KB total and resolved to on-disk
+#' paths. Safe to call on every connection.
+.create_aggregate_views <- function(con) {
   base <- .mastr_env$base_url
-  for (e in .remote_entities) {
-    url <- sprintf("%s/%s.parquet", base, e)
-    # CREATE VIEW over a remote Parquet; DuckDB only fetches row groups touched
-    # by each query (range requests over HTTPS).
-    sql <- sprintf(
-      "CREATE OR REPLACE VIEW %s AS SELECT * FROM read_parquet('%s')",
-      e, url)
-    try(dbExecute(con, sql), silent = TRUE)
-  }
-  # Aggregate parquets (small, ~1 MB each) that Python pre-rolled:
   agg_files <- c(
     "kpi_overview", "capacity_by_state", "buildout_monthly",
     "capacity_by_plz_top5000", "solar_size_classes",
     "wind_hub_height", "ee_quote_by_year"
   )
+  local_paths <- .prefetch_aggregates(agg_files)
   for (a in agg_files) {
-    url <- sprintf("%s/%s.parquet", base, a)
+    path_or_url <- local_paths[[a]]
+    if (is.null(path_or_url)) path_or_url <- sprintf("%s/%s.parquet", base, a)
     sql <- sprintf(
       "CREATE OR REPLACE VIEW agg_%s AS SELECT * FROM read_parquet('%s')",
-      a, url)
+      a, path_or_url)
     try(dbExecute(con, sql), silent = TRUE)
   }
-  # Re-create the cross-entity view (same SQL as build_duckdb.py).
+}
+
+#' Heavy path: create entity views (one per raw Parquet on GitHub Releases)
+#' and the schema-aware v_units_all UNION ALL view. Costs ~20-30 s cold because
+#' DuckDB probes each remote parquet footer over HTTPS to learn the schema.
+#' Called lazily from mastr_query() only when the SQL references v_units_all
+#' or a bare entity name.
+.ensure_entity_views <- function(con) {
+  if (isTRUE(.mastr_env$entities_ready)) return(invisible())
+  base <- .mastr_env$base_url
+  for (e in .remote_entities) {
+    url <- sprintf("%s/%s.parquet", base, e)
+    sql <- sprintf(
+      "CREATE OR REPLACE VIEW %s AS SELECT * FROM read_parquet('%s')",
+      e, url)
+    try(dbExecute(con, sql), silent = TRUE)
+  }
   .create_units_view(con)
+  .mastr_env$entities_ready <- TRUE
+  invisible()
+}
+
+# Back-compat alias so downstream code (or users) that call the old name still
+# work; this is what shinylive / runApp sessions used to invoke.
+.create_remote_views <- function(con) {
+  .create_aggregate_views(con)
+  .ensure_entity_views(con)
+}
+
+# Regex that matches any reference to a raw entity table or v_units_all. We
+# use word-boundary matching so that `agg_capacity_by_state` (which contains
+# "state" but no entity names) is NOT treated as needing entity views.
+.ENTITY_RE <- paste0(
+  "\\b(", paste(c(.remote_entities, "v_units_all"), collapse = "|"), ")\\b"
+)
+
+.needs_entity_views <- function(sql) {
+  grepl(.ENTITY_RE, sql, perl = TRUE, ignore.case = TRUE)
 }
 
 # Mirror of build_duckdb._table_columns / _col_or_null. Needed because BNetzA
@@ -218,16 +330,45 @@ mastr_disconnect <- function() {
 
 # ----- query helpers ---------------------------------------------------------
 
-#' Run a SQL query and return a data.frame. Memoised for the duration of the
-#' R session so repeated reactive evaluations don't re-fetch.
-mastr_query <- memoise::memoise(function(sql, params = list()) {
-  con <- mastr_con()
-  if (length(params)) {
-    DBI::dbGetQuery(con, sql, params = params)
-  } else {
-    DBI::dbGetQuery(con, sql)
+#' Run a SQL query and return a data.frame. Results are cached on disk (keyed
+#' by the current release tag + the normalised SQL), so repeat launches of any
+#' dashboard skip the query entirely. Cache survives R restarts; a new nightly
+#' release automatically invalidates everything because the tag is part of the
+#' key. Override with MASTR_QUERY_CACHE=0 to force re-execution.
+.build_query_cache <- function() {
+  if (identical(Sys.getenv("MASTR_QUERY_CACHE", "1"), "0")) {
+    return(cachem::cache_mem())
   }
-})
+  dir <- tryCatch({
+    tag <- .mastr_env$release_tag %||% "unknown"
+    root <- tryCatch(tools::R_user_dir("mastr-shiny", which = "cache"),
+                     error = function(e) file.path(tempdir(), "mastr-shiny-cache"))
+    d <- file.path(root, tag, "_queries")
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+    d
+  }, error = function(e) NULL)
+  if (is.null(dir)) return(cachem::cache_mem())
+  cachem::cache_disk(dir, max_size = 256 * 1024^2, evict = "lru")
+}
+.mastr_env$query_cache <- NULL
+.mastr_env$query_memo  <- NULL
+
+mastr_query <- function(sql, params = list()) {
+  .resolve_release()
+  if (is.null(.mastr_env$query_cache)) {
+    .mastr_env$query_cache <- .build_query_cache()
+    .mastr_env$query_memo  <- memoise::memoise(
+      function(sql, params) {
+        con <- mastr_con()
+        if (.needs_entity_views(sql)) .ensure_entity_views(con)
+        if (length(params)) DBI::dbGetQuery(con, sql, params = params)
+        else                DBI::dbGetQuery(con, sql)
+      },
+      cache = .mastr_env$query_cache
+    )
+  }
+  .mastr_env$query_memo(sql, params)
+}
 
 #' Pull an entire (small) view/table as a data.frame. Intended for KPI tiles
 #' and aggregate parquets; do NOT call on a full units table.

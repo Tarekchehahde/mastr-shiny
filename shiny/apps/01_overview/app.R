@@ -12,7 +12,7 @@ ui <- mastr_page(
   subtitle = "Alle Einheiten im Marktstammdatenregister, nächtlich aktualisiert.",
 
   layout_column_wrap(
-    width = 1/4,
+    width = 1/4, heights_equal = "row", fill = FALSE,
     uiOutput("kpi_units"),
     uiOutput("kpi_capacity"),
     uiOutput("kpi_ee_units"),
