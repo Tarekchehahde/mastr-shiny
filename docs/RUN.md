@@ -22,7 +22,9 @@ install.packages(c("shiny","bslib","DBI","duckdb","memoise","cachem","httr2","rl
 shiny::runGitHub("mastr-shiny","Tarekchehahde",subdir="shiny",ref="main",launch.browser=TRUE)
 ```
 
-You'll see a card grid with all 15 dashboards. Pick one.
+You'll see a card grid with the **Flagship** ("Most Visited") at the top,
+then the 15 **Core** dashboards, then the 9 **Tableau-Vergleich** dashboards
+that replicate the in-house Tableau workbook.
 
 ## Step 2 (alternative) — launch one dashboard directly
 
@@ -49,6 +51,16 @@ Swap `01_overview` for any of:
 | 13 | `13_capacity_trends` | time-series build-out |
 | 14 | `14_state_comparison` | Bundesland league tables |
 | 15 | `15_ee_quote` | renewable share by state |
+| ★ | `most_visited` | **Flagship** — R-Shiny clone of Candida's monthly Tableau panel (4 segment small-multiples + YTD diff table) |
+| 16 | `16_ibn_stacked_area` | Tableau *Inbetriebnahmen (2)* — stacked area by size bucket |
+| 17 | `17_anlagen_leistung` | Tableau *Überblick – Anlagen & Leistung* — summary row, 3 maps, Q-time series |
+| 18 | `18_ibn_tabelle` | Tableau *Inbetriebnahmen MaStR – Tabelle* — Jahr/Quartal/Monat + Δ |
+| 19 | `19_ibn_bars` | Tableau *Inbetriebnahmen MaStR* — quarterly bar panels |
+| 20 | `20_ibn_speicher_bars` | Tableau *Inbetriebnahmen Speicher* — storage version of 19 |
+| 21 | `21_ibn_speicher_tabelle` | Tableau *Inbetriebnahmen Speicher – Tabelle* |
+| 22 | `22_batteriekapazitaet` | Tableau *Histogramm Batteriekapazität* (partial — kWh column pending ETL extension) |
+| 23 | `23_registrierungsverhalten` | Tableau *Registrierungsverhalten* — IBN-vs-Registrierung delay |
+| 24 | `24_registrierungsverhalten_vergleich` | Tableau *Registrierungsverhalten im Vergleich* — heatmap matrix |
 
 ---
 
