@@ -248,23 +248,41 @@ server <- function(input, output, session) {
 
     yr_cols <- grep("^\\d{4}$", names(d), value = TRUE)
 
+    # Tight column widths so every year (including YEAR_NOW) fits inside the
+    # half-width card without triggering a horizontal scrollbar.
+    # Budget at ~560 px card width:  Monat 78 + Kennzahl 82 + N×60  ≈ 480-540
+    n_years  <- length(yr_cols)
+    year_w   <- if (n_years <= 5) 68 else if (n_years == 6) 60 else 54
+
     cdefs <- c(
       list(
-        MonthName = colDef(name = "Monat", minWidth = 95, sticky = "left",
+        MonthName = colDef(name = "Monat", minWidth = 78, sticky = "left",
                            cell = function(value, index, name) {
                              if (d$Kennzahl[index] == "Wert") as.character(value) else ""
                            }),
-        Kennzahl  = colDef(name = "", minWidth = 120, sticky = "left",
+        Kennzahl  = colDef(name = "", minWidth = 82, sticky = "left",
                            style = function(value) list(color = "#6b7280",
-                                                        fontStyle = "italic"))
+                                                        fontStyle = "italic",
+                                                        whiteSpace = "nowrap",
+                                                        fontSize = "0.78rem"),
+                           cell = function(value) {
+                             if (value == "Abw. zu Vorjahr") "Abw. Vj." else value
+                           })
       ),
       setNames(lapply(yr_cols, function(y) colDef(
-        name = y, align = "right", minWidth = 80,
+        name = y, align = "right", minWidth = year_w,
+        headerStyle = list(fontWeight = 600,
+                           background = if (y == as.character(YEAR_NOW))
+                             "#fde68a" else "#f9fafb"),
         style = function(value, index) {
-          if (d$Kennzahl[index] == "Wert") return(list(fontWeight = 500))
-          if (is.na(value) || !is.numeric(value)) return(NULL)
+          base <- if (y == as.character(YEAR_NOW))
+            list(background = "#fef3c7") else list()
+          if (d$Kennzahl[index] == "Wert")
+            return(modifyList(base, list(fontWeight = 500, whiteSpace = "nowrap")))
+          if (is.na(value) || !is.numeric(value)) return(base)
           col <- if (value >= 0) "#15803d" else "#b91c1c"
-          list(color = col, fontStyle = "italic")
+          modifyList(base, list(color = col, fontStyle = "italic",
+                                whiteSpace = "nowrap"))
         },
         cell = function(value, index) {
           if (d$Kennzahl[index] == "Wert") {
@@ -273,10 +291,13 @@ server <- function(input, output, session) {
           } else if (is.na(value)) {
             ""
           } else {
+            # Keep it on ONE line: no space before % and 1 decimal when the
+            # column is narrow, 2 decimals when there's room.
+            digits <- if (n_years <= 5) 1 else 1
             sprintf("%s%s%%",
                     if (value >= 0) "+" else "",
                     formatC(value * 100, big.mark = ".", decimal.mark = ",",
-                            format = "f", digits = 2))
+                            format = "f", digits = digits))
           }
         })), yr_cols)
     )
@@ -291,7 +312,7 @@ server <- function(input, output, session) {
       },
       theme = reactableTheme(
         headerStyle = list(fontWeight = 600, background = "#f9fafb"),
-        cellPadding = "6px 8px"
+        cellPadding = "5px 6px"
       )
     )
   })
