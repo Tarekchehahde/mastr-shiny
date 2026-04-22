@@ -9,6 +9,7 @@ source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Wind — Offshore",
   subtitle = "Offshore-Windparks in Nord- und Ostsee.",
+  fluid = TRUE,
 
   layout_column_wrap(1/3,
     uiOutput("kpi_turbines"), uiOutput("kpi_capacity"), uiOutput("kpi_parks")),

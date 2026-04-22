@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "KWK — Kraft-Wärme-Kopplung",
   subtitle = "Elektrische und thermische Nutzleistung der KWK-Anlagen.",
+  fluid = TRUE,
 
   layout_column_wrap(1/3,
     uiOutput("kpi_n"), uiOutput("kpi_el"), uiOutput("kpi_th")),

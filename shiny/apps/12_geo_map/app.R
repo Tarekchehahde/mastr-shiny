@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Geo-Karte",
   subtitle = "Postleitzahlen-geclusterte Karte aller Einheiten (Top 5000).",
+  fluid = TRUE,
   layout_sidebar(
     sidebar = sidebar(
       title = "Filter", width = 260,

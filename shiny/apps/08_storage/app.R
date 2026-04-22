@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Stromspeicher",
   subtitle = "Batteriespeicher- und Pumpspeicher-Einheiten, Leistung & Kapazität.",
+  fluid = TRUE,
 
   layout_column_wrap(1/4,
     uiOutput("kpi_n"), uiOutput("kpi_mw"), uiOutput("kpi_mwh"), uiOutput("kpi_crate")),

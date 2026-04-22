@@ -9,6 +9,7 @@ source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Wind — Onshore",
   subtitle = "Turbinen-Populationen, Nabenhöhen, Rotordurchmesser und Zubau.",
+  fluid = TRUE,
   layout_sidebar(
     sidebar = sidebar(
       title = "Filter", width = 260,

@@ -9,16 +9,21 @@ source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Solar — Photovoltaik-Einheiten",
   subtitle = "Größenklassen, Zubau und regionale Verteilung der PV-Anlagen.",
+  fluid = TRUE,
 
   layout_sidebar(
     sidebar = sidebar(
-      title = "Filter", width = 260,
-      selectInput("bl", "Bundesland (Mehrfachauswahl)",
-                  choices = NULL, selected = NULL, multiple = TRUE),
+      title = "Filter", width = 290,
+      selectizeInput("bl", "Bundesland (Mehrfachauswahl)",
+                     choices = NULL, selected = NULL, multiple = TRUE,
+                     options = list(
+                       placeholder = "Alle Bundesländer",
+                       plugins = list("remove_button"))),
       sliderInput("year", "Inbetriebnahme-Jahre",
                   min = 1990, max = as.integer(format(Sys.Date(), "%Y")),
                   value = c(2010, as.integer(format(Sys.Date(), "%Y"))),
-                  sep = ""),
+                  sep = "", step = 1,
+                  ticks = FALSE),
       radioButtons("status", "Betriebsstatus",
                    choices = c("Alle" = "all", "Nur aktive" = "active"),
                    selected = "all"),
@@ -26,20 +31,23 @@ ui <- mastr_page(
     ),
 
     layout_column_wrap(
-      width = 1/3,
+      width = 1/3, heights_equal = "row", fill = FALSE,
       uiOutput("kpi_count"), uiOutput("kpi_mw"), uiOutput("kpi_avg_kw")
     ),
 
     layout_column_wrap(
       width = 1/2, heights_equal = "row",
-      card(card_header("Größenklassen (Bruttoleistung)"),
-           plotlyOutput("plot_size_classes", height = "380px")),
-      card(card_header("Zubau nach Jahr"),
-           plotlyOutput("plot_buildout_year", height = "380px"))
+      card(full_screen = TRUE,
+           card_header("Größenklassen (Bruttoleistung)"),
+           plotlyOutput("plot_size_classes", height = "420px")),
+      card(full_screen = TRUE,
+           card_header("Zubau nach Jahr"),
+           plotlyOutput("plot_buildout_year", height = "420px"))
     ),
 
-    card(card_header("Top 30 Postleitzahlen nach installierter Leistung"),
-         reactableOutput("table_plz"))
+    card(full_screen = TRUE,
+         card_header("Top 30 Postleitzahlen nach installierter Leistung"),
+         reactableOutput("table_plz", height = "auto"))
   )
 )
 
@@ -95,10 +103,17 @@ server <- function(input, output, session) {
             marker = list(color = MASTR_PALETTE$solar), name = "Einheiten") |>
       add_trace(y = ~mw, yaxis = "y2", name = "MW",
                 marker = list(color = MASTR_PALETTE$primary)) |>
-      layout(yaxis  = list(title = "Einheiten"),
-             yaxis2 = list(title = "MW", overlaying = "y", side = "right"),
-             xaxis  = list(title = ""),
-             legend = list(orientation = "h"))
+      layout(margin = list(t = 30, r = 60, b = 70, l = 60),
+             yaxis  = list(title = list(text = "Einheiten", standoff = 10),
+                           automargin = TRUE),
+             yaxis2 = list(title = list(text = "MW", standoff = 10),
+                           overlaying = "y", side = "right",
+                           showgrid = FALSE, automargin = TRUE),
+             xaxis  = list(title = "", tickangle = -20, automargin = TRUE),
+             legend = list(orientation = "h", y = -0.20, x = 0.5,
+                           xanchor = "center")) |>
+      config(displaylogo = FALSE,
+             modeBarButtonsToRemove = c("lasso2d","select2d","autoScale2d"))
   })
 
   output$plot_buildout_year <- renderPlotly({
@@ -111,8 +126,12 @@ server <- function(input, output, session) {
       GROUP BY 1 ORDER BY 1", where_sql()))
     plot_ly(d, x = ~year, y = ~mw, type = "bar",
             marker = list(color = MASTR_PALETTE$solar)) |>
-      layout(yaxis = list(title = "Zubau MW"),
-             xaxis = list(title = ""))
+      layout(margin = list(t = 30, r = 30, b = 60, l = 60),
+             yaxis = list(title = list(text = "Zubau MW", standoff = 10),
+                          automargin = TRUE),
+             xaxis = list(title = "", dtick = 2, automargin = TRUE)) |>
+      config(displaylogo = FALSE,
+             modeBarButtonsToRemove = c("lasso2d","select2d","autoScale2d"))
   })
 
   output$table_plz <- renderReactable({
@@ -121,11 +140,14 @@ server <- function(input, output, session) {
              ROUND(SUM(bruttoleistung_kw)/1000, 1) AS mw
       FROM v_units_all WHERE %s AND plz IS NOT NULL
       GROUP BY 1 ORDER BY mw DESC LIMIT 30", where_sql()))
-    reactable(d, compact = TRUE, striped = TRUE, defaultPageSize = 10,
+    reactable(d, compact = TRUE, striped = TRUE, highlight = TRUE,
+              defaultPageSize = 10, minRows = 10,
               columns = list(
-                plz   = colDef(name = "PLZ", width = 100),
-                units = colDef(name = "Einheiten"),
-                mw    = colDef(name = "MW")
+                plz   = colDef(name = "PLZ", width = 120, align = "left"),
+                units = colDef(name = "Einheiten", format = colFormat(separators = TRUE),
+                               align = "right"),
+                mw    = colDef(name = "MW", format = colFormat(separators = TRUE, digits = 1),
+                               align = "right")
               ))
   })
 }

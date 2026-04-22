@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Biomasse & Biogas",
   subtitle = "Anlagen der stofflichen / thermischen Verwertung in Deutschland.",
+  fluid = TRUE,
 
   layout_column_wrap(1/3,
     uiOutput("kpi_n"), uiOutput("kpi_mw"), uiOutput("kpi_avg")),

@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Geothermie & Sonstige",
   subtitle = "Tiefe Geothermie, Solarthermie, Grubengas, Klärgas, Druckentspannung.",
+  fluid = TRUE,
 
   layout_column_wrap(1/3,
     uiOutput("kpi_n"), uiOutput("kpi_mw"), uiOutput("kpi_types")),

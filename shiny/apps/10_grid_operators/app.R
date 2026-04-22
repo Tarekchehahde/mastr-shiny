@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Netzbetreiber",
   subtitle = "Netzanschlusspunkte je Betreiber und Spannungsebene.",
+  fluid = TRUE,
 
   layout_column_wrap(1/3,
     uiOutput("kpi_ops"), uiOutput("kpi_conn"), uiOutput("kpi_voltage_levels")),

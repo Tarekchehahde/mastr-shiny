@@ -8,6 +8,7 @@ source("../../R/mastr_data.R"); source("../../R/ui_helpers.R")
 ui <- mastr_page(
   title = "Marktakteure",
   subtitle = "Registrierte Unternehmen und Organisationen im MaStR.",
+  fluid = TRUE,
 
   layout_column_wrap(1/3,
     uiOutput("kpi_actors"), uiOutput("kpi_types"), uiOutput("kpi_newest")),

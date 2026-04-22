@@ -19,6 +19,7 @@ POP <- data.frame(
 ui <- mastr_page(
   title = "Bundesländer-Vergleich",
   subtitle = "Installierte Leistung absolut und pro Kopf.",
+  fluid = TRUE,
   layout_sidebar(
     sidebar = sidebar(width = 260,
       selectInput("tech", "Energieträger",
