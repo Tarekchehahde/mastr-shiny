@@ -9,14 +9,16 @@
 #       <10 kW = Home, <1 MW = C&I, Rest Large Scale."
 #
 # Parity goals (match what Candida generates):
-#   1. 4 small multiples (Home / C&I / Large Scale / Grand Total) of monthly
-#      new-capacity (DC/Brutto MW), one colored line per year 2022..current.
+#   1. Four vertically stacked small multiples (Home / C&I / Large Scale /
+#      Grand Total) of monthly new-capacity (DC/Brutto MW), one colored line
+#      per year yr_from..current.
 #   2. Year-to-date columns highlighted with a light orange band.
 #   3. Side table "IBN Differenz der Vorjahre - Total | Brutto/DC-Leistung MW"
-#      — YTD months x last 6 years, with absolute Wert and % Abw. zu Vorjahr.
+#      — YTD months × last 5-6 years, two rows per month (Wert + Abw. zu
+#      Vorjahr), layout mirrors the Candida screenshot 1:1.
 #
 # Data differences from Tableau:
-#   - Candida re-buckets Einheiten after BNetzA's size classes; we do the
+#   - Candida re-buckets Einheiten after BNetzA's size classes; we apply the
 #     same Home/C&I/Large-Scale split on Bruttoleistung (kW) at query time.
 #   - We read the raw solar parquet through DuckDB httpfs, so the numbers
 #     come from the SAME BNetzA MaStR source, one night newer than Tableau.
@@ -37,9 +39,11 @@ MONTH_NOW <- as.integer(format(Sys.Date(), "%m"))
 # light blue (oldest) -> dark grey -> orange (current year).
 SEGMENT_YEAR_COLORS <- function(years) {
   n <- length(years)
-  pal <- c("#9ec3dc","#7b9db7","#5e7a8e","#44566a","#f97316")
+  pal <- c("#a8c9e2","#7b9db7","#5e7a8e","#3f4a57","#f97316")
   if (n <= length(pal)) tail(pal, n) else c(rep(pal[1], n - length(pal) + 1), pal[-1])
 }
+
+SEGMENTS <- c("Home", "C&I", "Large Scale", "Grand Total")
 
 ui <- mastr_page(
   title = "Most Visited \u2014 Zubauleistung pro Segment (R Shiny-Nachbau)",
@@ -71,12 +75,24 @@ ui <- mastr_page(
         "). Quelle BNetzA MaStR.")
     ),
 
+    # 2-column layout: left = 4 stacked small multiples (each its own plotly),
+    # right = the Candida-style YTD diff table.
     layout_column_wrap(
       width = 1/2, heights_equal = "row",
-      card(full_screen = TRUE,
-           card_header("MaStR \u2014 monatlicher Zubau pro Segment"),
-           plotlyOutput("plot_segments", height = "620px")),
-      card(full_screen = TRUE,
+
+      card(full_screen = TRUE, height = "720px",
+           card_header("MaStR \u2014 monatlicher Zubau pro Segment (MW)"),
+           div(class = "p-2",
+               div(class = "mb-1 small text-muted fw-semibold", "Home (< 10 kW)"),
+               plotlyOutput("plot_home",   height = "130px"),
+               div(class = "mb-1 small text-muted fw-semibold mt-2", "C&I (10 kW \u2013 < 1 MW)"),
+               plotlyOutput("plot_ci",     height = "130px"),
+               div(class = "mb-1 small text-muted fw-semibold mt-2", "Large Scale (\u2265 1 MW)"),
+               plotlyOutput("plot_large",  height = "130px"),
+               div(class = "mb-1 small text-muted fw-semibold mt-2", "Grand Total"),
+               plotlyOutput("plot_total",  height = "140px"))),
+
+      card(full_screen = TRUE, height = "720px",
            card_header(sprintf(
              "IBN Differenz der Vorjahre \u2014 Total | %s",
              "Brutto/DC-Leistung MW")),
@@ -94,8 +110,8 @@ server <- function(input, output, session) {
       "AND EinheitBetriebsstatus = 'InBetrieb'" else ""
     sql <- sprintf("
       SELECT
-        %s AS year,
-        %s AS month,
+        CAST(%s AS INTEGER) AS year,
+        CAST(%s AS INTEGER) AS month,
         %s AS segment,
         SUM(%s) / 1000.0 AS mw,
         COUNT(*)         AS units
@@ -112,80 +128,84 @@ server <- function(input, output, session) {
       sql_segment_3("Bruttoleistung"),
       metric_col,
       metric_col,
-      sql_ibn_year("Inbetriebnahmedatum"),
-      input$yr_from,
-      sql_ibn_year("Inbetriebnahmedatum"),
-      YEAR_NOW,
+      sql_ibn_year("Inbetriebnahmedatum"), input$yr_from,
+      sql_ibn_year("Inbetriebnahmedatum"), YEAR_NOW,
       active_filter)
     mastr_query(sql)
   })
 
-  # ---- small multiples (Home / C&I / Large Scale / Grand Total) -------------
-  output$plot_segments <- renderPlotly({
+  data_with_total <- reactive({
     d <- data_monthly()
-    if (!nrow(d)) return(plotly_empty(type = "scatter", mode = "lines"))
-    d$year    <- as.integer(d$year)
-    d$month   <- as.integer(d$month)
-    d$segment <- factor(d$segment, levels = c("Home","C&I","Large Scale"))
-
+    if (!nrow(d)) return(d)
+    d$segment <- as.character(d$segment)
     total <- d |>
       group_by(year, month) |>
-      summarise(mw = sum(mw, na.rm = TRUE), .groups = "drop") |>
-      mutate(segment = factor("Grand Total",
-                              levels = c("Home","C&I","Large Scale","Grand Total")))
-
-    dat <- bind_rows(d |> mutate(segment = factor(as.character(segment),
-                                                  levels = levels(total$segment))),
-                     total)
-
-    years <- sort(unique(dat$year))
-    cols  <- setNames(SEGMENT_YEAR_COLORS(years), as.character(years))
-
-    segments <- levels(dat$segment)
-    plots <- lapply(segments, function(seg) {
-      dd <- dat |> filter(segment == seg)
-      p  <- plot_ly(height = 150)
-      for (y in years) {
-        dy <- dd |> filter(year == y) |> arrange(month)
-        p <- add_trace(p, data = dy,
-                       x = ~month, y = ~mw,
-                       name = as.character(y),
-                       legendgroup = as.character(y),
-                       showlegend = (seg == segments[1]),
-                       type = "scatter", mode = "lines+markers",
-                       line = list(color = cols[[as.character(y)]],
-                                   width = if (y == YEAR_NOW) 3 else 1.5),
-                       marker = list(color = cols[[as.character(y)]],
-                                     size = if (y == YEAR_NOW) 6 else 4))
-      }
-      p |> layout(
-        annotations = list(list(
-          xref = "paper", yref = "paper", x = 0.02, y = 0.95,
-          text = paste0("<b>", seg, "</b>"),
-          showarrow = FALSE, align = "left", font = list(size = 13))),
-        shapes = list(list(
-          type = "rect", xref = "x", yref = "paper",
-          x0 = 0.5, x1 = input$ytd_m + 0.5, y0 = 0, y1 = 1,
-          fillcolor = "#fde68a", opacity = 0.25, line = list(width = 0))),
-        xaxis = list(
-          title = "", tickmode = "array", tickvals = 1:12,
-          ticktext = substr(MONTHS_DE, 1, 3),
-          tickangle = 0),
-        yaxis = list(title = "", automargin = TRUE),
-        margin = list(t = 20, r = 10, b = 30, l = 40)
-      )
-    })
-
-    subplot(plots, nrows = 4, shareX = TRUE, titleY = FALSE,
-            margin = 0.02) |>
-      layout(legend = list(orientation = "h", y = 1.05, x = 0.5,
-                           xanchor = "center",
-                           title = list(text = ""))) |>
-      config(displaylogo = FALSE,
-             modeBarButtonsToRemove = c("lasso2d","select2d","autoScale2d"))
+      summarise(mw = sum(mw, na.rm = TRUE),
+                units = sum(units, na.rm = TRUE),
+                segment = "Grand Total",
+                .groups = "drop")
+    bind_rows(d, total)
   })
 
-  # ---- IBN Differenz der Vorjahre - Total (table) ---------------------------
+  # ----- one small-multiple per segment --------------------------------------
+  make_segment_plot <- function(segment_name, show_legend = FALSE) {
+    d <- data_with_total()
+    if (!nrow(d) || !(segment_name %in% d$segment))
+      return(plotly_empty(type = "scatter", mode = "lines"))
+    dd <- d |> filter(segment == segment_name) |>
+      mutate(year = as.integer(year), month = as.integer(month)) |>
+      arrange(year, month)
+    years <- sort(unique(dd$year))
+    cols  <- setNames(SEGMENT_YEAR_COLORS(years), as.character(years))
+
+    p <- plot_ly(height = if (segment_name == "Grand Total") 140 else 130)
+    for (y in years) {
+      dy <- dd |> filter(year == y)
+      is_current <- (y == YEAR_NOW)
+      p <- add_trace(p,
+                     data = dy,
+                     x = ~month, y = ~mw,
+                     name = as.character(y),
+                     legendgroup = as.character(y),
+                     showlegend = show_legend,
+                     type = "scatter", mode = "lines+markers",
+                     line = list(color = cols[[as.character(y)]],
+                                 width = if (is_current) 3 else 1.5),
+                     marker = list(color = cols[[as.character(y)]],
+                                   size = if (is_current) 6 else 4),
+                     hovertemplate = paste0(as.character(y),
+                                            " \u00b7 %{x}: %{y:,.0f} MW<extra></extra>"))
+    }
+    p |> layout(
+      shapes = list(list(
+        type = "rect", xref = "x", yref = "paper",
+        x0 = 0.5, x1 = input$ytd_m + 0.5, y0 = 0, y1 = 1,
+        fillcolor = "#fde68a", opacity = 0.25, line = list(width = 0))),
+      xaxis = list(title = "",
+                   tickmode = "array", tickvals = 1:12,
+                   ticktext = substr(MONTHS_DE, 1, 3),
+                   tickangle = 0, tickfont = list(size = 10)),
+      yaxis = list(title = list(text = "MW", standoff = 4),
+                   automargin = TRUE, tickfont = list(size = 10),
+                   zeroline = TRUE, zerolinecolor = "#e5e7eb"),
+      margin = list(t = 8, r = 8, b = 22, l = 46),
+      showlegend = show_legend,
+      legend = list(orientation = "h", y = 1.18, x = 0.5,
+                    xanchor = "center", yanchor = "bottom",
+                    font = list(size = 11))
+    ) |>
+      config(displaylogo = FALSE, displayModeBar = FALSE)
+  }
+
+  output$plot_home  <- renderPlotly(make_segment_plot("Home",        show_legend = TRUE))
+  output$plot_ci    <- renderPlotly(make_segment_plot("C&I",         show_legend = FALSE))
+  output$plot_large <- renderPlotly(make_segment_plot("Large Scale", show_legend = FALSE))
+  output$plot_total <- renderPlotly(make_segment_plot("Grand Total", show_legend = FALSE))
+
+  # ----- Candida-style YTD diff table ----------------------------------------
+  # Layout: 1 row per month, sub-rows ("Wert" + "Abw. zu Vorjahr") via a
+  # "Kennzahl" column. One column per year (newest on the right). Every year
+  # fits in the visible width, so 2026 is always visible.
   table_diff <- reactive({
     d <- data_monthly()
     if (!nrow(d)) return(NULL)
@@ -197,59 +217,83 @@ server <- function(input, output, session) {
       filter(month <= ytd_m)
 
     years <- sort(unique(total$year))
-    wide <- total |>
-      mutate(MonthName = factor(MONTHS_DE[month],
-                                levels = MONTHS_DE)) |>
-      select(MonthName, year, mw) |>
-      tidyr::pivot_wider(names_from = year, values_from = mw, values_fill = 0)
-
-    out <- wide |> arrange(MonthName)
     yr_cols <- as.character(years)
-    keep <- c("MonthName", yr_cols)
-    out <- out[, keep, drop = FALSE]
 
-    # For each year column, add an "abw. zu Vorjahr" column as fraction.
+    wide <- total |>
+      mutate(MonthName = factor(MONTHS_DE[month], levels = MONTHS_DE)) |>
+      select(MonthName, year, mw) |>
+      tidyr::pivot_wider(names_from = year, values_from = mw,
+                         values_fill = 0, names_prefix = "y_")
+
+    wide <- wide[, c("MonthName", paste0("y_", yr_cols))]
+    names(wide)[-1] <- yr_cols
+    wide <- wide |> arrange(MonthName)
+
+    # Build the Wert rows and the % rows.
+    wert_df <- wide |> mutate(Kennzahl = "Wert", .after = MonthName)
+    abw_df  <- wide |> mutate(Kennzahl = "Abw. zu Vorjahr", .after = MonthName)
     for (i in seq_along(yr_cols)) {
-      y  <- yr_cols[i]
-      if (i == 1) next
-      prev <- yr_cols[i - 1]
-      out[[paste0("\u0394 ", y)]] <- (out[[y]] - out[[prev]]) / out[[prev]]
+      if (i == 1) { abw_df[[yr_cols[i]]] <- NA_real_; next }
+      prev <- yr_cols[i - 1]; y <- yr_cols[i]
+      abw_df[[y]] <- (wide[[y]] - wide[[prev]]) / wide[[prev]]
     }
-    out
+
+    bind_rows(wert_df, abw_df) |>
+      arrange(MonthName, match(Kennzahl, c("Wert", "Abw. zu Vorjahr")))
   })
 
   output$tbl_diff <- renderReactable({
     d <- table_diff()
     if (is.null(d) || !nrow(d)) return(reactable(data.frame()))
 
-    val_cols <- grep("^\\d{4}$", names(d), value = TRUE)
-    dlt_cols <- grep("^\u0394", names(d), value = TRUE)
+    yr_cols <- grep("^\\d{4}$", names(d), value = TRUE)
 
     cdefs <- c(
-      list(MonthName = reactable::colDef(name = "Monat", minWidth = 110, sticky = "left")),
-      setNames(lapply(val_cols, function(y) reactable::colDef(
-        name = y, align = "right",
-        format = reactable::colFormat(separators = TRUE, digits = 0))),
-        val_cols),
-      setNames(lapply(dlt_cols, function(y) reactable::colDef(
-        name = gsub("^\u0394 ", "\u0394 ", y), align = "right",
-        style = function(value) {
+      list(
+        MonthName = colDef(name = "Monat", minWidth = 95, sticky = "left",
+                           cell = function(value, index, name) {
+                             if (d$Kennzahl[index] == "Wert") as.character(value) else ""
+                           }),
+        Kennzahl  = colDef(name = "", minWidth = 120, sticky = "left",
+                           style = function(value) list(color = "#6b7280",
+                                                        fontStyle = "italic"))
+      ),
+      setNames(lapply(yr_cols, function(y) colDef(
+        name = y, align = "right", minWidth = 80,
+        style = function(value, index) {
+          if (d$Kennzahl[index] == "Wert") return(list(fontWeight = 500))
           if (is.na(value) || !is.numeric(value)) return(NULL)
-          if (value >= 0) list(color = "#15803d", fontWeight = 500)
-          else             list(color = "#b91c1c", fontWeight = 500)
+          col <- if (value >= 0) "#15803d" else "#b91c1c"
+          list(color = col, fontStyle = "italic")
         },
-        format = reactable::colFormat(percent = TRUE, digits = 2,
-                                      separators = TRUE))),
-        dlt_cols)
+        cell = function(value, index) {
+          if (d$Kennzahl[index] == "Wert") {
+            formatC(value, big.mark = ".", decimal.mark = ",",
+                    format = "f", digits = 0)
+          } else if (is.na(value)) {
+            ""
+          } else {
+            sprintf("%s%s%%",
+                    if (value >= 0) "+" else "",
+                    formatC(value * 100, big.mark = ".", decimal.mark = ",",
+                            format = "f", digits = 2))
+          }
+        })), yr_cols)
     )
 
-    reactable(d,
-              columns = cdefs,
-              compact = TRUE, striped = TRUE, highlight = TRUE,
-              defaultPageSize = 12, minRows = 1,
-              bordered = FALSE,
-              theme = reactableTheme(
-                headerStyle = list(fontWeight = 600)))
+    reactable(
+      d, columns = cdefs,
+      compact = TRUE, bordered = FALSE, highlight = TRUE, striped = FALSE,
+      defaultPageSize = 24, minRows = 1,
+      pagination = FALSE,
+      rowStyle = function(index) {
+        if (d$Kennzahl[index] == "Wert") list(borderTop = "1px solid #e5e7eb") else NULL
+      },
+      theme = reactableTheme(
+        headerStyle = list(fontWeight = 600, background = "#f9fafb"),
+        cellPadding = "6px 8px"
+      )
+    )
   })
 }
 
