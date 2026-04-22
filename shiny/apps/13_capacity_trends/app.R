@@ -31,8 +31,7 @@ server <- function(input, output, session) {
     parts <- c(sprintf("EXTRACT(YEAR FROM month) BETWEEN %d AND %d",
                        input$yr[1], input$yr[2]))
     if (length(input$tech))
-      parts <- c(parts, sprintf("energietraeger IN (%s)",
-                                paste(sQuote(input$tech), collapse = ", ")))
+      parts <- c(parts, sprintf("energietraeger IN (%s)", mastr_sql_in(input$tech)))
     mastr_query(sprintf("
       SELECT month, energietraeger,
              new_capacity_mw,

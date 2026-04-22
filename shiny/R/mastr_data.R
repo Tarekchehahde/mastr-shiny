@@ -420,6 +420,21 @@ mastr_energietraeger <- memoise::memoise(function() {
   mastr_query("SELECT DISTINCT energietraeger FROM v_units_all ORDER BY 1")$energietraeger
 })
 
+#' Build a safe SQL string list for an IN (...) clause. R's base `sQuote()`
+#' uses Unicode curly quotes (U+2018 / U+2019), which DuckDB parses as an
+#' identifier, producing the infamous 'Referenced column "Bayern" not found'
+#' error. Use this helper in every dashboard's WHERE generator instead of
+#' paste(sQuote(x), collapse = ", ").
+#'
+#' @examples
+#'   sprintf("bundesland_name IN (%s)", mastr_sql_in(c("Bayern","Hessen")))
+#'   # -> bundesland_name IN ('Bayern','Hessen')
+mastr_sql_in <- function(values) {
+  if (!length(values)) return("NULL")
+  escaped <- gsub("'", "''", as.character(values), fixed = TRUE)
+  paste0("'", escaped, "'", collapse = ", ")
+}
+
 # ----- footer helper ---------------------------------------------------------
 
 mastr_attribution <- function() {

@@ -31,8 +31,7 @@ server <- function(input, output, session) {
       FROM agg_capacity_by_plz_top5000
       WHERE bruttoleistung_mw >= %f", input$min_mw)
     if (length(input$tech))
-      sql <- paste0(sql, sprintf(" AND energietraeger IN (%s)",
-                                 paste(sQuote(input$tech), collapse = ", ")))
+      sql <- paste0(sql, sprintf(" AND energietraeger IN (%s)", mastr_sql_in(input$tech)))
     mastr_query(sql)
   })
 

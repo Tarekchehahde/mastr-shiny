@@ -58,8 +58,7 @@ server <- function(input, output, session) {
   where_sql <- reactive({
     parts <- c("energietraeger = 'SolareStrahlungsenergie'")
     if (length(input$bl))
-      parts <- c(parts, sprintf("bundesland_name IN (%s)",
-                                paste(sQuote(input$bl), collapse = ", ")))
+      parts <- c(parts, sprintf("bundesland_name IN (%s)", mastr_sql_in(input$bl)))
     parts <- c(parts, sprintf(
       "EXTRACT(YEAR FROM inbetriebnahme_datum) BETWEEN %d AND %d",
       input$year[1], input$year[2]))
