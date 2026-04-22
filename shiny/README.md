@@ -5,7 +5,7 @@ No XML, no Python, no local database by default.
 
 ```
 shiny/
-├── run_app.R          # launcher with a card for every dashboard
+├── app.R              # launcher with a card for every dashboard (auto-picked by runGitHub)
 ├── R/
 │   ├── mastr_data.R   # shared DuckDB-httpfs loader (queries GitHub Releases)
 │   └── ui_helpers.R   # shared bslib theme + KPI helpers
@@ -24,7 +24,7 @@ shiny/
 
 ```r
 install.packages("renv"); renv::restore()
-shiny::runApp("run_app.R")
+shiny::runApp(".")
 ```
 
 ### B. Launch a specific dashboard

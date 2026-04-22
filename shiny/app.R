@@ -1,6 +1,9 @@
 # =============================================================================
-# run_app.R — single entry point that shows a picker and launches the chosen
-# dashboard.  Open this file in RStudio and click "Run App".
+# app.R — single entry point that shows a picker and launches the chosen
+# dashboard. Open this file in RStudio and click "Run App", or call
+#   shiny::runApp("shiny")                    # from the repo root
+#   shiny::runGitHub("mastr-shiny", "Tarekchehahde", subdir = "shiny",
+#                    ref = "main", launch.browser = TRUE)
 #
 # Tip: to launch a single dashboard directly, run
 #   shiny::runApp("apps/02_solar_pv")

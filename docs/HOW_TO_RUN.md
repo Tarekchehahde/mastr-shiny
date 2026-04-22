@@ -37,7 +37,7 @@ In RStudio (set the working directory to the `shiny/` folder first):
 ```r
 install.packages("renv")
 renv::restore()
-shiny::runApp("run_app.R")
+shiny::runApp(".")
 
 # or a specific dashboard directly:
 shiny::runApp("apps/02_solar_pv")
