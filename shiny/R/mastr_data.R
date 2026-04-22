@@ -224,14 +224,17 @@ mastr_disconnect <- function() {
 # Bundesland code -> name lookup (mirrors etl/src/mastr_etl/config.py:BUNDESLAND).
 # Keep in sync with the Python side; this is the client-side copy so v_units_all
 # can expose bundesland_name without having to read the server-built duckdb.
+# Verified empirically by correlating each code with its dominant PLZ prefix
+# across the full MaStR solar table (2026-04-21 data release). Do NOT reorder
+# without re-running that check — the BNetzA Katalog ordering is NOT alphabetic.
 .BUNDESLAND <- c(
-  "1400" = "Schleswig-Holstein",     "1401" = "Hamburg",
-  "1402" = "Niedersachsen",          "1403" = "Bremen",
-  "1404" = "Nordrhein-Westfalen",    "1405" = "Hessen",
-  "1406" = "Rheinland-Pfalz",        "1407" = "Baden-Württemberg",
-  "1408" = "Bayern",                 "1409" = "Saarland",
-  "1410" = "Berlin",                 "1411" = "Brandenburg",
-  "1412" = "Mecklenburg-Vorpommern", "1413" = "Sachsen",
+  "1400" = "Brandenburg",            "1401" = "Berlin",
+  "1402" = "Baden-Württemberg",      "1403" = "Bayern",
+  "1404" = "Bremen",                 "1405" = "Hessen",
+  "1406" = "Hamburg",                "1407" = "Mecklenburg-Vorpommern",
+  "1408" = "Niedersachsen",          "1409" = "Nordrhein-Westfalen",
+  "1410" = "Rheinland-Pfalz",        "1411" = "Schleswig-Holstein",
+  "1412" = "Saarland",               "1413" = "Sachsen",
   "1414" = "Sachsen-Anhalt",         "1415" = "Thüringen",
   "1416" = "Ausschließliche Wirtschaftszone"
 )
