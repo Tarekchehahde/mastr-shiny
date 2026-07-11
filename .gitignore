@@ -70,6 +70,10 @@ WORK/docs/export_references*
 WORK/docs/scholar_build.log
 WORK/docs/__pycache__/
 
+# Kaggle credentials (never commit)
+.kaggle/
+**/kaggle.env
+
 # Local-only server credentials (never commit)
 WORK/docs/SERVER.credentials.local.md
 WORK/docs/*.credentials.local.md
