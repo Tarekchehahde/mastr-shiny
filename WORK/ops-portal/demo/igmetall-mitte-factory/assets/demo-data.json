@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "title": "Werksgelände — Mitgliedschaftsübersicht",
+    "subtitle": "Isometrische Eagle-Eye-Ansicht des Werksgeländes — Proof-of-Concept für IG Metall Mitte.",
+    "disclaimer": "Alle dargestellten Daten sind fiktiv und dienen ausschließlich Demonstrationszwecken. Dieses Dashboard ist ein Proof-of-Concept für IG Metall Mitte und stellt keine echten Betriebs-, Personal- oder Gewerkschaftsdaten dar. Keine offizielle Publikation der IG Metall. Gehostet auf dem privaten Demo-Server von Tarek Chehade — es werden keine echten Personaldaten verarbeitet oder gespeichert.",
+    "updated": "2026-07-11",
+    "image_credit": "Isometrische Werksansicht: fiktive Demo-Visualisierung (KI-generiert, nicht real)"
+  },
+  "summary": {
+    "buildings": 6,
+    "employees_total": 1847,
+    "ig_metall_members": 1124,
+    "not_yet_members": 723,
+    "organizing_rate_pct": 61
+  },
+  "buildings": [
+    {
+      "id": "halle-a",
+      "name": "Halle A — Produktion",
+      "short_label": "Halle A",
+      "index": 1,
+      "x_pct": 14,
+      "y_pct": 30,
+      "employees_total": 412,
+      "ig_metall_members": 278,
+      "not_yet_members": 134,
+      "department": "Fertigung / CNC"
+    },
+    {
+      "id": "halle-b",
+      "name": "Halle B — Montage",
+      "short_label": "Halle B",
+      "index": 2,
+      "x_pct": 30,
+      "y_pct": 44,
+      "employees_total": 356,
+      "ig_metall_members": 201,
+      "not_yet_members": 155,
+      "department": "Endmontage"
+    },
+    {
+      "id": "verwaltung",
+      "name": "Verwaltungsgebäude",
+      "short_label": "Verwaltung",
+      "index": 3,
+      "x_pct": 50,
+      "y_pct": 54,
+      "employees_total": 148,
+      "ig_metall_members": 89,
+      "not_yet_members": 59,
+      "department": "Verwaltung & Planung"
+    },
+    {
+      "id": "logistik",
+      "name": "Logistikzentrum",
+      "short_label": "Logistik",
+      "index": 4,
+      "x_pct": 73,
+      "y_pct": 46,
+      "employees_total": 287,
+      "ig_metall_members": 176,
+      "not_yet_members": 111,
+      "department": "Lager & Versand"
+    },
+    {
+      "id": "werkstatt",
+      "name": "Instandhaltung / Werkstatt",
+      "short_label": "Werkstatt",
+      "index": 5,
+      "x_pct": 24,
+      "y_pct": 74,
+      "employees_total": 198,
+      "ig_metall_members": 142,
+      "not_yet_members": 56,
+      "department": "Technische Dienste"
+    },
+    {
+      "id": "neubau-sued",
+      "name": "Neubau Süd — Forschung",
+      "short_label": "Forschung",
+      "index": 6,
+      "x_pct": 84,
+      "y_pct": 30,
+      "employees_total": 446,
+      "ig_metall_members": 238,
+      "not_yet_members": 208,
+      "department": "Entwicklung & Qualität"
+    }
+  ]
+}

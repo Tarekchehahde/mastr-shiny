@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="CCS Ops Pulse — Demo Operations Dashboard für CCS GmbH Erfurt"/>
+  <title>CCS Ops Pulse — Heute</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="/demo/ccs-ops-pulse/assets/ccs.css"/>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/demo/ccs-ops-pulse/">
+      CCS Ops Pulse
+      <span>Pitch-Demo · Catering Operations</span>
+    </a>
+    <div class="nav-tabs" id="ccs-nav"></div>
+  </nav>
+
+  <header class="hero">
+    <h1>Heute — Standortübersicht</h1>
+    <p class="sub">Neun Kantinen, Messe, Arena und Theater in einer Live-Ansicht — für Gespräche mit CCS GmbH Erfurt.</p>
+    <p class="disclaimer" id="disclaimer-text">Beispieldaten laden…</p>
+  </header>
+
+  <main class="wrap">
+    <div id="event-banner" hidden></div>
+
+    <div class="stat-row" id="ccs-stats"></div>
+
+    <section class="panel">
+      <h2>Standorte Erfurt</h2>
+      <p class="panel-note">Echte Adressen · Status = Demo</p>
+      <div id="map"></div>
+      <ul class="site-list" id="site-list" style="margin-top:1rem"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Bereiche</h2>
+      <p class="panel-note">Tippen Sie für die Detailansicht auf dem Tablet.</p>
+      <div class="card-grid">
+        <a class="nav-card" href="/demo/ccs-ops-pulse/kantinen/">
+          <div class="icon">🍽</div>
+          <h3>Kantinen</h3>
+          <p>Speiseplan, Auslastung, Bio-Anteil, HACCP pro Standort.</p>
+        </a>
+        <a class="nav-card" href="/demo/ccs-ops-pulse/events/">
+          <div class="icon">📅</div>
+          <h3>Events</h3>
+          <p>Messe, Arena, Theater — Gäste, Modus, Personalbedarf.</p>
+        </a>
+        <a class="nav-card" href="/demo/ccs-ops-pulse/nachhaltigkeit/">
+          <div class="icon">🌿</div>
+          <h3>Nachhaltigkeit</h3>
+          <p>Bio, regional, Strompreis, PV-Potenzial Thüringen.</p>
+        </a>
+        <a class="nav-card" href="/demo/ccs-ops-pulse/qualitaet/">
+          <div class="icon">✓</div>
+          <h3>Qualität</h3>
+          <p>HACCP / ISO-Übersicht — audit-ready im Pilot.</p>
+        </a>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Konzept &amp; Demo von <a href="/about/">Tarek Chehade</a> ·
+      Kein offizielles CCS-Produkt ·
+      <a href="https://www.ccs-erfurt.de/" target="_blank" rel="noopener">ccs-erfurt.de</a>
+    </p>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/demo/ccs-ops-pulse/assets/ccs.js"></script>
+  <script>CCSOpsPulse.init("heute");</script>
+</body>
+</html>

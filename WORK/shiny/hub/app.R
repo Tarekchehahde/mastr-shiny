@@ -8,6 +8,7 @@
 #   /health_wealth_nations/ -> Gapminder-style bubble chart (port 3841)
 #   /lebanese_elections/    -> Lebanese elections Tableau replica (port 3842)
 #   /my_manager_demo/       -> Executive pitch / manager demo (port 3843)
+#   /demo/igmetall-mitte-factory/ -> static IG Metall Mitte pitch demo (nginx alias)
 #   /deutschland_solar_radiation/ -> Live solar GHI map Germany (port 3844)
 #   /thueringen_gewerbe_strom/       -> Demo 1 Gewerbe-Strom (port 3847)
 #   /thueringen_waermepumpe_gebaeude/ -> Demo 2 (port 3848)
@@ -52,6 +53,16 @@ DASHBOARDS <- list(
     badge_class = "bg-primary",
     desc = "Executive demo: hub navigation, live interactivity, delivery pipeline, and live catalog — for your Monday presentation.",
     highlight = FALSE
+  ),
+  list(
+    id = "igmetall_mitte_factory",
+    title = "IG Metall Mitte \u2014 Werksgel\u00e4nde",
+    badge = "Pitch",
+    badge_class = "bg-danger",
+    badge_style = "background-color: #e30613 !important;",
+    desc = "Isometrische Eagle-Eye-Ansicht: Besch\u00e4ftigte, IG-Metall-Mitglieder und Organisationspotenzial pro Geb\u00e4ude \u2014 Proof-of-Concept f\u00fcr IG Metall Mitte (Tarek Chehade). Fiktive Demo-Daten, \u00f6ffentlich teilbar.",
+    highlight = FALSE,
+    href = "/demo/igmetall-mitte-factory/"
   ),
   list(
     id = "dummy_demo",
@@ -200,25 +211,206 @@ hub_dashboards <- function() {
   }
 }
 
-.card_for <- function(d) {
-  cls <- "h-100"
-  if (isTRUE(d$highlight)) cls <- paste(cls, "border-warning border-3 shadow-sm")
+.dashboard_href <- function(d) {
+  d$href %||% .app_href(d$id)
+}
+
+.card_for <- function(d, idx = 1) {
+  cls <- "h-100 hub-card"
+  if (isTRUE(d$highlight)) cls <- paste(cls, "hub-card-highlight")
   badge <- tags$span(class = paste("badge me-2", d$badge_class), d$badge)
   if (!is.null(d$badge_style)) {
     badge$attribs$style <- d$badge_style
   }
   card(
     class = cls,
+    style = sprintf("--hub-delay: %sms;", (idx - 1) * 70),
     card_header(
       badge,
       d$title
     ),
     p(class = "text-muted mb-3", d$desc),
     tags$a(
-      class = if (isTRUE(d$highlight)) "btn btn-warning" else "btn btn-primary",
-      href = .app_href(d$id),
+      class = if (isTRUE(d$highlight)) "btn btn-warning hub-btn" else "btn btn-primary hub-btn",
+      href = .dashboard_href(d),
       target = "_self",
-      "Open dashboard"
+      "Open dashboard ",
+      tags$span(class = "hub-btn-arrow", HTML("&rarr;"))
+    )
+  )
+}
+
+.hub_cards <- function() {
+  ds <- hub_dashboards()
+  Map(function(d, i) .card_for(d, i), ds, seq_along(ds))
+}
+
+hub_motion_css <- function() {
+  tags$style(HTML("
+    /* ---------- Hero ---------- */
+    .hub-hero {
+      position: relative; overflow: hidden;
+      border-radius: 18px;
+      padding: 2.6rem 2rem 2.2rem;
+      margin-bottom: 1.75rem;
+      color: #e2e8f0;
+      background: linear-gradient(115deg, #0f172a, #1e2a4a 45%, #14233c 70%, #0f172a);
+      background-size: 260% 260%;
+      animation: hubGradientShift 16s ease infinite;
+    }
+    @keyframes hubGradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hub-hero h2 {
+      font-weight: 700; letter-spacing: -0.02em; margin-bottom: .4rem;
+      background: linear-gradient(90deg, #ffffff, #93c5fd, #6ee7b7, #ffffff);
+      background-size: 300% auto;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      animation: hubTextShimmer 7s linear infinite;
+    }
+    @keyframes hubTextShimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 300% center; }
+    }
+    .hub-hero .hub-hero-sub { color: #94a3b8; max-width: 46rem; }
+    .hub-hero .hub-hero-sub a { color: #7dd3fc; }
+    .hub-hero .hub-hero-hint { color: #64748b; font-size: .8rem; margin-bottom: 0; }
+    .hub-hero .hub-hero-hint code { color: #93c5fd; background: rgba(148,163,184,.12);
+                                    padding: 1px 5px; border-radius: 4px; }
+    /* Floating aurora blobs */
+    .hub-blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(46px); opacity: .5; pointer-events: none;
+      will-change: transform;
+    }
+    .hub-blob-1 { width: 300px; height: 300px; top: -120px; right: -60px;
+      background: radial-gradient(circle, rgba(59,130,246,.55), transparent 65%);
+      animation: hubFloat1 13s ease-in-out infinite; }
+    .hub-blob-2 { width: 240px; height: 240px; bottom: -110px; left: 12%;
+      background: radial-gradient(circle, rgba(16,185,129,.45), transparent 65%);
+      animation: hubFloat2 17s ease-in-out infinite; }
+    .hub-blob-3 { width: 190px; height: 190px; top: 10%; left: 55%;
+      background: radial-gradient(circle, rgba(245,158,11,.35), transparent 65%);
+      animation: hubFloat3 21s ease-in-out infinite; }
+    @keyframes hubFloat1 { 0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(-45px, 35px) scale(1.12); } }
+    @keyframes hubFloat2 { 0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(55px, -30px) scale(.92); } }
+    @keyframes hubFloat3 { 0%,100% { transform: translate(0,0); }
+      33% { transform: translate(-35px, 25px); }
+      66% { transform: translate(30px, -20px); } }
+    /* Drifting particle dots */
+    .hub-particle {
+      position: absolute; bottom: -8px; border-radius: 50%;
+      background: rgba(148, 197, 253, .5); pointer-events: none;
+      animation: hubRise linear infinite;
+    }
+    @keyframes hubRise {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      12%  { opacity: .7; }
+      88%  { opacity: .5; }
+      100% { transform: translateY(-320px) translateX(28px); opacity: 0; }
+    }
+    /* ---------- Cards ---------- */
+    .hub-card {
+      opacity: 0;
+      animation: hubCardIn .6s cubic-bezier(.22,1,.36,1) forwards;
+      animation-delay: var(--hub-delay, 0ms);
+      transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease;
+      position: relative; overflow: hidden;
+      border: 1px solid rgba(15,23,42,.08);
+    }
+    @keyframes hubCardIn {
+      from { opacity: 0; transform: translateY(22px) scale(.985); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .hub-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #0B5ED7, #10b981, #f59e0b, #0B5ED7);
+      background-size: 300% auto;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .35s cubic-bezier(.22,1,.36,1);
+      animation: hubTextShimmer 5s linear infinite;
+      z-index: 2;
+    }
+    .hub-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px -14px rgba(15, 23, 42, .28);
+    }
+    .hub-card:hover::before { transform: scaleX(1); }
+    /* Shine sweep on hover */
+    .hub-card::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 55%;
+      left: -80%; transform: skewX(-18deg);
+      background: linear-gradient(90deg, transparent,
+                  rgba(255,255,255,.35), transparent);
+      transition: left .65s ease; pointer-events: none; z-index: 1;
+    }
+    .hub-card:hover::after { left: 130%; }
+    .hub-card-highlight {
+      border: 2px solid rgba(245,158,11,.75);
+      box-shadow: 0 6px 22px -8px rgba(245,158,11,.35);
+      animation: hubCardIn .6s cubic-bezier(.22,1,.36,1) forwards,
+                 hubGlowPulse 3.2s ease-in-out infinite 1s;
+    }
+    @keyframes hubGlowPulse {
+      0%,100% { box-shadow: 0 6px 22px -8px rgba(245,158,11,.30); }
+      50%     { box-shadow: 0 6px 30px -6px rgba(245,158,11,.55); }
+    }
+    .hub-card .badge { transition: transform .25s ease; }
+    .hub-card:hover .badge { transform: scale(1.08); }
+    /* Button arrow nudge */
+    .hub-btn .hub-btn-arrow { display: inline-block;
+      transition: transform .25s cubic-bezier(.22,1,.36,1); }
+    .hub-btn:hover .hub-btn-arrow { transform: translateX(5px); }
+    /* ---------- Accessibility ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .hub-hero, .hub-hero h2, .hub-blob, .hub-particle,
+      .hub-card, .hub-card::before, .hub-card-highlight {
+        animation: none !important;
+      }
+      .hub-card { opacity: 1; }
+      .hub-card, .hub-btn .hub-btn-arrow { transition: none; }
+    }
+  "))
+}
+
+hub_hero <- function() {
+  particles <- lapply(1:9, function(i) {
+    tags$span(
+      class = "hub-particle",
+      style = sprintf(
+        "left: %s%%; width: %spx; height: %spx; animation-duration: %ss; animation-delay: %ss;",
+        c(6, 16, 27, 38, 50, 61, 72, 84, 93)[i],
+        c(5, 3, 6, 4, 3, 5, 4, 6, 3)[i],
+        c(5, 3, 6, 4, 3, 5, 4, 6, 3)[i],
+        c(9, 13, 8, 15, 11, 10, 14, 9, 12)[i],
+        c(0, 2.5, 1, 4, 0.5, 3, 1.8, 5, 2)[i]
+      )
+    )
+  })
+  div(
+    class = "hub-hero",
+    div(class = "hub-blob hub-blob-1"),
+    div(class = "hub-blob hub-blob-2"),
+    div(class = "hub-blob hub-blob-3"),
+    particles,
+    h2("Dashboard Hub"),
+    p(
+      class = "hub-hero-sub",
+      "Live data dashboards \u2014 select one below. ",
+      tags$a(href = "/portal/", class = "text-decoration-none", "Mission Control"),
+      " \u00b7 ",
+      tags$a(href = "/about/", class = "text-decoration-none", "About"),
+      ", Grafana, docs."
+    ),
+    p(
+      class = "hub-hero-hint",
+      "Add new entries in ", code("hub/app.R"),
+      " and register the app path in nginx/systemd."
     )
   )
 }
@@ -239,31 +431,16 @@ ui <- page_fluid(
       .hub-card-grid > * { width: 100% !important; max-width: 100% !important; }
     }
   ")),
+  hub_motion_css(),
   div(
     class = "container py-4",
-    div(
-      class = "mb-4",
-      h2("Dashboard Hub"),
-      p(
-        class = "text-muted",
-        "Select a dashboard below. ",
-        tags$a(href = "/portal/", class = "text-decoration-none", "Mission Control"),
-        " — ",
-        tags$a(href = "/about/", class = "text-decoration-none", "About"),
-        ", Grafana, docs."
-      ),
-      p(
-        class = "text-muted small mb-0",
-        "Add new entries in ",
-        code("hub/app.R"), " and register the app path in nginx/systemd."
-      )
-    ),
+    hub_hero(),
     div(
       class = "hub-card-grid",
       layout_column_wrap(
       width = 1/2,
       gap = "1rem",
-      !!!lapply(hub_dashboards(), .card_for)
+      !!!.hub_cards()
       )
     ),
     hr(),

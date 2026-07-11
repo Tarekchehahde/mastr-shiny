@@ -1,0 +1,219 @@
+{
+  "meta": {
+    "title": "CCS Ops Pulse",
+    "subtitle": "Standortübersicht · Events · Kantinen · Nachhaltigkeit",
+    "client": "Pitch-Demo für CCS GmbH Erfurt",
+    "disclaimer": "Beispieldaten — keine offiziellen CCS-Zahlen",
+    "updated": "2026-06-27"
+  },
+  "summary": {
+    "sites_total": 9,
+    "event_areas": 3,
+    "staff_approx": 100,
+    "events_this_week": 2
+  },
+  "sites": [
+    {
+      "id": "hq",
+      "name": "CCS Zentrale",
+      "type": "kantine",
+      "address": "Alfred-Hess-Str. 32a, 99094 Erfurt",
+      "lat": 50.9628,
+      "lng": 11.0042,
+      "status": "ok",
+      "status_label": "OK",
+      "note": "Betriebsgastronomie · Zentrale"
+    },
+    {
+      "id": "ihk",
+      "name": "Cafeteria IHK Erfurt",
+      "type": "kantine",
+      "address": "Arnstädter Str. 34, 99096 Erfurt",
+      "lat": 50.9712,
+      "lng": 11.0088,
+      "status": "ok",
+      "status_label": "OK",
+      "note": "Öffentlich · Konferenzversorgung"
+    },
+    {
+      "id": "theater",
+      "name": "Kantine Theater Erfurt",
+      "type": "kantine",
+      "address": "Theaterplatz 1, 99084 Erfurt",
+      "lat": 50.9789,
+      "lng": 11.0325,
+      "status": "hint",
+      "status_label": "Hinweis",
+      "note": "Neuer Standort · erhöhte Nachfrage erwartet"
+    },
+    {
+      "id": "behoerden",
+      "name": "Cafeteria Behördenzentrum",
+      "type": "kantine",
+      "address": "Ludwig-Erhard-Ring 6, 99096 Erfurt",
+      "lat": 50.9655,
+      "lng": 11.0210,
+      "status": "ok",
+      "status_label": "OK",
+      "note": "Thüringer Finanzministerium"
+    },
+    {
+      "id": "regierung",
+      "name": "Kantine Regierungsviertel",
+      "type": "kantine",
+      "address": "Werner-Seelenbinder-Str. 6, 99096 Erfurt",
+      "lat": 50.9688,
+      "lng": 11.0185,
+      "status": "ok",
+      "status_label": "OK",
+      "note": "Am Alten Steiger"
+    },
+    {
+      "id": "sternauto",
+      "name": "Kantine STERNAUTO",
+      "type": "kantine",
+      "address": "Binderslebener Landstr. 92, 99092 Erfurt",
+      "lat": 50.9580,
+      "lng": 11.0120,
+      "status": "ok",
+      "status_label": "OK",
+      "note": "Öffentlich"
+    },
+    {
+      "id": "messe",
+      "name": "Messe Erfurt Catering",
+      "type": "event",
+      "address": "Messeplatz 1, 99091 Erfurt",
+      "lat": 50.9725,
+      "lng": 11.0370,
+      "status": "event",
+      "status_label": "Event heute",
+      "note": "Exklusivpartner Gastronomie"
+    },
+    {
+      "id": "arena",
+      "name": "Arena Erfurt Catering",
+      "type": "event",
+      "address": "Steigerwaldstraße, 99091 Erfurt",
+      "lat": 50.9755,
+      "lng": 11.0455,
+      "status": "event",
+      "status_label": "Event diese Woche",
+      "note": "Digitales Kassensystem · Verkaufsstände"
+    }
+  ],
+  "kantinen": [
+    {
+      "id": "ihk",
+      "name": "Cafeteria IHK Erfurt",
+      "hours": "Mo–Fr 08:00–14:00",
+      "meals_today": [
+        { "name": "Thüringer Klöße mit Rotkohl", "tags": ["regional", "vegetarisch_option"] },
+        { "name": "Gebratene Seelachsfilets", "tags": ["klassisch"] },
+        { "name": "Bio-Gemüsepfanne", "tags": ["bio", "vegan"] }
+      ],
+      "occupancy_pct": 78,
+      "bio_share_pct": 42,
+      "haccp_checks_done": 2,
+      "haccp_checks_total": 2
+    },
+    {
+      "id": "theater",
+      "name": "Kantine Theater Erfurt",
+      "hours": "Mo–Fr 09:00–14:30",
+      "meals_today": [
+        { "name": "Pasta mit Tomaten-Basilikum", "tags": ["vegetarisch"] },
+        { "name": "Hähnchenbrust mit Salat", "tags": ["klassisch"] },
+        { "name": "Linsensuppe", "tags": ["vegan", "regional"] }
+      ],
+      "occupancy_pct": 65,
+      "bio_share_pct": 38,
+      "haccp_checks_done": 2,
+      "haccp_checks_total": 2
+    },
+    {
+      "id": "behoerden",
+      "name": "Cafeteria Behördenzentrum",
+      "hours": "Mo–Fr 08:00–14:00",
+      "meals_today": [
+        { "name": "Rinderbraten mit Bratensoße", "tags": ["klassisch"] },
+        { "name": "Kartoffelsuppe", "tags": ["vegetarisch"] },
+        { "name": "Salatbar", "tags": ["bio", "regional"] }
+      ],
+      "occupancy_pct": 71,
+      "bio_share_pct": 45,
+      "haccp_checks_done": 1,
+      "haccp_checks_total": 2
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-06-27",
+      "title": "Messe · Fachausstellung Mittelstand",
+      "venue": "Messe Erfurt",
+      "guests_est": 3200,
+      "mode": "Konferenz & Buffet",
+      "staff_need": "high",
+      "staff_label": "Hoch"
+    },
+    {
+      "date": "2026-06-28",
+      "title": "Arena · Konzertabend",
+      "venue": "Arena Erfurt",
+      "guests_est": 8500,
+      "mode": "Konzept & Verkaufsstände",
+      "staff_need": "high",
+      "staff_label": "Hoch"
+    },
+    {
+      "date": "2026-07-03",
+      "title": "Messe · Tagung Gesundheitswirtschaft",
+      "venue": "Messe Erfurt",
+      "guests_est": 1800,
+      "mode": "Konferenzcatering",
+      "staff_need": "medium",
+      "staff_label": "Mittel"
+    },
+    {
+      "date": "2026-07-05",
+      "title": "Theater · Premierenwoche",
+      "venue": "Theater Erfurt",
+      "guests_est": 450,
+      "mode": "Gastronomie Kantine + Empfang",
+      "staff_need": "medium",
+      "staff_label": "Mittel"
+    },
+    {
+      "date": "2026-07-12",
+      "title": "Messe · Consumer & Lifestyle",
+      "venue": "Messe Erfurt",
+      "guests_est": 12000,
+      "mode": "Großevent · Messecatering",
+      "staff_need": "high",
+      "staff_label": "Sehr hoch"
+    }
+  ],
+  "nachhaltigkeit": {
+    "bio_share_pct": 41,
+    "regional_suppliers": 28,
+    "food_waste_kg_week": 124,
+    "food_waste_trend": "down",
+    "strompreis_eur_mwh": 87.4,
+    "strompreis_source": "Day-ahead DE-LU (Beispielwert Demo)",
+    "strompreis_hint": "Bei hohem Preis: Vorkühlung & Produktionsfenster optimieren",
+    "pv_potential_kwp_erfurt": 8420,
+    "pv_note": "Aggregiertes PV-Potenzial Gewerbe Erfurt (MaStR-orientiert, Demo)"
+  },
+  "haccp": [
+    { "site": "IHK Erfurt", "temp": "ok", "cleaning": "ok", "delivery": "ok", "docs": "ok" },
+    { "site": "Theater Erfurt", "temp": "ok", "cleaning": "ok", "delivery": "ok", "docs": "ok" },
+    { "site": "Behördenzentrum", "temp": "ok", "cleaning": "pending", "delivery": "ok", "docs": "ok" },
+    { "site": "Regierungsviertel", "temp": "ok", "cleaning": "ok", "delivery": "ok", "docs": "ok" },
+    { "site": "Messe Erfurt", "temp": "ok", "cleaning": "ok", "delivery": "pending", "docs": "ok" },
+    { "site": "Arena Erfurt", "temp": "ok", "cleaning": "ok", "delivery": "ok", "docs": "pending" }
+  ],
+  "links": {
+    "strom_live": "/eu_electricity_live/",
+    "ccs_public": "https://www.ccs-erfurt.de/"
+  }
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="CCS Ops Pulse — Events"/>
+  <title>CCS Ops Pulse — Events</title>
+  <link rel="stylesheet" href="/demo/ccs-ops-pulse/assets/ccs.css"/>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/demo/ccs-ops-pulse/">
+      CCS Ops Pulse
+      <span>Pitch-Demo · Catering Operations</span>
+    </a>
+    <div class="nav-tabs" id="ccs-nav"></div>
+  </nav>
+
+  <header class="hero">
+    <h1>Events</h1>
+    <p class="sub">Messe Erfurt · Arena Erfurt · Theater — Planung vor Einkauf und Personal.</p>
+    <p class="disclaimer" id="disclaimer-text">Beispieldaten laden…</p>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <h2>Kommende Veranstaltungen</h2>
+      <p class="panel-note">Demo-Termine · Phase 1: öffentlicher Messe-Kalender + Arena-Plan</p>
+      <div id="events-list"></div>
+    </section>
+
+    <section class="panel">
+      <h2>CCS Kontext</h2>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0 0 0.5rem">
+        Exklusivpartner Messe Erfurt und Arena Erfurt · Events von 10 bis 30.000 Gästen.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="https://www.ccs-erfurt.de/leistungen/" target="_blank" rel="noopener">CCS Leistungen</a>
+        <a class="btn" href="/demo/ccs-ops-pulse/">← Heute</a>
+      </div>
+    </section>
+
+    <p class="footer-note"><a href="/about/">Tarek Chehade</a> · Pitch-Demo</p>
+  </main>
+
+  <script src="/demo/ccs-ops-pulse/assets/ccs.js"></script>
+  <script>CCSOpsPulse.init("events");</script>
+</body>
+</html>

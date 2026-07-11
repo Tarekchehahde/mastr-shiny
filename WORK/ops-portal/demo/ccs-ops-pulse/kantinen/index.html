@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="CCS Ops Pulse — Kantinen"/>
+  <title>CCS Ops Pulse — Kantinen</title>
+  <link rel="stylesheet" href="/demo/ccs-ops-pulse/assets/ccs.css"/>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/demo/ccs-ops-pulse/">
+      CCS Ops Pulse
+      <span>Pitch-Demo · Catering Operations</span>
+    </a>
+    <div class="nav-tabs" id="ccs-nav"></div>
+  </nav>
+
+  <header class="hero">
+    <h1>Kantinen</h1>
+    <p class="sub">Betriebsgastronomie — Speiseplan, Auslastung und Qualitätssignale pro Standort.</p>
+    <p class="disclaimer" id="disclaimer-text">Beispieldaten laden…</p>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <h2>Standort wählen</h2>
+      <select class="kantine-select" id="kantine-select" aria-label="Kantine wählen"></select>
+      <div id="kantine-detail"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Phase-1-Pilot</h2>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0">
+        Anbindung an wöchentlichen Speiseplan (Newsletter/PDF) und eine Kantine — z.&nbsp;B. IHK oder Theater Erfurt.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="/demo/ccs-ops-pulse/">← Zurück zu Heute</a>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      <a href="/about/">Tarek Chehade</a> · Pitch-Demo
+    </p>
+  </main>
+
+  <script src="/demo/ccs-ops-pulse/assets/ccs.js"></script>
+  <script>CCSOpsPulse.init("kantinen");</script>
+</body>
+</html>

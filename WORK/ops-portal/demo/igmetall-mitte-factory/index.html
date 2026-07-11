@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="IG Metall Mitte — Demo-Dashboard Werksgelände · Mitgliedschaftsübersicht (Proof-of-Concept)"/>
+  <title>IG Metall Mitte — Werksgelände Demo</title>
+  <link rel="stylesheet" href="/demo/igmetall-mitte-factory/assets/igmetall.css"/>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/demo/igmetall-mitte-factory/">
+      <img src="/demo/igmetall-mitte-factory/assets/igmetall-logo.svg" alt="IG Metall Logo"/>
+      <div class="brand-text">
+        <strong>Werksgelände — Mitgliedschaftsübersicht</strong>
+        <span>Proof-of-Concept · IG Metall Mitte · Demo</span>
+      </div>
+    </a>
+    <span class="nav-badge nav-badge-live">Live · Öffentlich</span>
+  </nav>
+
+  <header class="hero">
+    <p class="author-credit">Konzept, Umsetzung &amp; Hosting: <strong>Tarek Chehade</strong></p>
+    <h1>Beschäftigtenverteilung auf dem Werksgelände</h1>
+    <p class="sub">Isometrische Eagle-Eye-Ansicht des Werksgeländes — fahren Sie mit der Maus über die roten Markierungen oder tippen Sie auf ein Gebäude, um Mitgliederzahlen und Organisationspotenzial zu sehen.</p>
+    <p class="live-notice">
+      <strong>Live-Demo:</strong> Diese Ansicht läuft auf meinem privaten Server und ist öffentlich im Internet erreichbar.
+      Sie können den Link frei weitergeben — jede Person mit dem Link kann die Demo ansehen.
+    </p>
+    <p class="disclaimer" id="disclaimer-text">Beispieldaten laden…</p>
+  </header>
+
+  <main class="wrap">
+    <div class="stat-row" id="igm-stats"></div>
+
+    <section class="panel">
+      <h2>Werksgelände — Gebäudeübersicht</h2>
+      <p class="panel-note">Isometrische Ansicht mit interaktiven Markierungen · Alle Werte sind fiktiv</p>
+      <div class="map-hint" id="map-hint">
+        <span class="map-hint-icon">👆</span>
+        <strong>Interaktiv:</strong> Bewegen Sie die Maus über die nummerierten roten Markierungen — oder tippen Sie auf ein Gebäude in der Liste unten.
+      </div>
+      <div class="site-map" id="site-map" aria-label="Interaktive Werkskarte"></div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot"></span> Gebäudestandort</span>
+        <span class="legend-item"><span style="color:var(--member)">●</span> IG Metall Mitglieder</span>
+        <span class="legend-item"><span style="color:var(--pending)">●</span> Noch nicht organisiert</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Gebäudeliste</h2>
+      <p class="panel-note">Klicken Sie auf eine Zeile, um das Gebäude auf der Karte hervorzuheben.</p>
+      <ul class="building-list" id="building-list"></ul>
+    </section>
+
+    <p class="footer-note">
+      Konzept, Umsetzung &amp; Hosting: <strong>Tarek Chehade</strong> ·
+      <a href="/about/">Profil &amp; Kontakt</a> ·
+      Kein offizielles IG-Metall-Produkt ·
+      Öffentliche Live-Demo — Link frei teilbar ·
+      <span id="image-credit"></span> ·
+      <a href="https://www.igmetall.de/" target="_blank" rel="noopener">igmetall.de</a>
+    </p>
+  </main>
+
+  <script src="/demo/igmetall-mitte-factory/assets/igmetall.js"></script>
+  <script>IGMetallFactory.init();</script>
+</body>
+</html>
