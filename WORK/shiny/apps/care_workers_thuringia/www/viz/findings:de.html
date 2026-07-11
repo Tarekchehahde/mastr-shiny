@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zentrale Ergebnisse - Pflegekräfte in Thüringen</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d9ff;
+            --primary-dark: #0099cc;
+            --secondary: #ff6b6b;
+            --accent: #ffd93d;
+            --success: #6bcb77;
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e4e4e4;
+            --text-muted: #888;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Credits Section */
+        .credits-section {
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .credits-section h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .credits-section p {
+            color: #ccc;
+            margin: 8px 0;
+        }
+
+        .credits-section strong {
+            color: var(--primary);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.02));
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Key Stats Banner */
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Findings Sections */
+        .findings-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        /* Finding Cards */
+        .finding-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .finding-card:hover {
+            border-color: rgba(0, 217, 255, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.1);
+        }
+
+        .finding-card h3 {
+            color: var(--text);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .finding-card h3::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .finding-card p {
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .finding-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .finding-card li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--text-muted);
+        }
+
+        .finding-card li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.02));
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .highlight-box p {
+            color: var(--text);
+            margin: 0;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .data-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .data-item-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .data-item-icon.health { background: rgba(107, 203, 119, 0.2); }
+        .data-item-icon.education { background: rgba(206, 147, 216, 0.2); }
+        .data-item-icon.services { background: rgba(255, 193, 7, 0.2); }
+        .data-item-icon.other { background: rgba(255, 107, 107, 0.2); }
+
+        .data-item-content h4 {
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .data-item-content p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Location List */
+        .location-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .location-tag {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .location-tag span {
+            color: var(--text-muted);
+            margin-left: 5px;
+        }
+
+        /* Methodology Section */
+        .methodology {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .methodology h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .methodology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .methodology-item h4 {
+            color: var(--text);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .methodology-item p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Open in New Tab Button */
+        .open-tab-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d9ff, #0099cc);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .open-tab-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Danksagung -->
+        <section class="credits-section">
+            <h2>👥 Danksagung</h2>
+            <p><strong>Team:</strong> Nour Alwan, Kenny Tam, Ceren Toraman, Aboli Ghodekar, Sarah Agyeiwaa Darko, Luigia Hannah Blankson, Hayelom Belay Seyoum, Oriane Kaiser</p>
+            <p><strong>Dozent:</strong> Prof. Dr. Achim Kemmerling</p>
+            <p><strong>Auftraggeber:</strong> Deutsches Zentrum für Integrations- und Migrationsforschung (DeZIM)</p>
+        </section>
+
+        <header>
+            <h1>Zentrale Ergebnisse</h1>
+            <p class="subtitle">Analyse der Gesundheitsorganisationen und der Rekrutierungslandschaft für Pflegekräfte in Thüringen</p>
+        </header>
+
+        <!-- Wichtige Statistiken -->
+        <div class="stats-banner">
+            <div class="stat-item">
+                <span class="stat-number">59</span>
+                <span class="stat-label">Organisationen</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">25</span>
+                <span class="stat-label">Standorte</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">4</span>
+                <span class="stat-label">Sektoren</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">93%</span>
+                <span class="stat-label">Mit Kontaktdaten</span>
+            </div>
+        </div>
+
+        <!-- Zusammenfassung -->
+        <section class="findings-section">
+            <h2 class="section-title">
+                <span class="section-icon">📋</span>
+                Zusammenfassung
+            </h2>
+            <div class="finding-card">
+                <p>Diese Studie kartierte die Landschaft der Gesundheitsorganisationen, die am Rekrutierungsweg von Pflegekräften in Thüringen beteiligt sind. Durch systematische Datenerhebung aus zwei Primärquellen—Weltoffenes Thüringen und der Bundesagentur für Arbeit—wurden <strong>59 relevante Organisationen</strong> identifiziert, die in der Region tätig sind.</p>
+                
+                <div class="highlight-box">
+                    <h4>Zentrale Erkenntnis</h4>
+                    <p>Der Pflegesektor in Thüringen wird von Gesundheits- und Sozialorganisationen dominiert (83%), mit einer starken Konzentration in städtischen Zentren, insbesondere Erfurt (30,5% aller Organisationen).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektorverteilung -->
+        <section class="findings-section">
+            <h2 class="section-title">
+                <span class="section-icon">📊</span>
+                Sektorverteilung
+            </h2>
+            <div class="finding-card">
+                <h3>Organisationen nach Wirtschaftssektor (WZ 2008 Klassifikation)</h3>
+                <p>Die Organisationen wurden nach der Klassifikation der Wirtschaftszweige (WZ 2008) eingeordnet:</p>
+                
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="data-item-icon health">🏥</div>
+                        <div class="data-item-content">
+                            <h4>Gesundheits- und Sozialwesen (Sektor R)</h4>
+                            <p>49 Organisationen (83%) — Krankenhäuser, Pflegedienste, stationäre Einrichtungen und Sozialarbeit</p>
+                        </div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-item-icon other">🤝</div>
+                        <div class="data-item-content">
+                            <h4>Sonstige Dienstleistungen (Sektor T)</h4>
+                            <p>4 Organisationen (7%) — Interessenvertretungen, Gewerkschaften und Mitgliedsorganisationen</p>
+                        </div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-item-icon education">📚</div>
+                        <div class="data-item-content">
+                            <h4>Erziehung und Unterricht (Sektor Q)</h4>
+                            <p>3 Organisationen (5%) — Berufsausbildung und Gesundheitsakademien</p>
+                        </div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-item-icon services">💼</div>
+                        <div class="data-item-content">
+                            <h4>Arbeitnehmerüberlassung (Sektor O)</h4>
+                            <p>3 Organisationen (5%) — Zeitarbeit und Personalvermittlung</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dienstleistungsarten -->
+        <section class="findings-section">
+            <h2 class="section-title">
+                <span class="section-icon">🏛️</span>
+                Dienstleistungsarten
+            </h2>
+            <div class="finding-card">
+                <h3>Aufschlüsselung nach Dienstleistungskategorie</h3>
+                <p>Innerhalb des Gesundheits- und Sozialwesens bieten die Organisationen vielfältige Dienstleistungen an:</p>
+                <ul>
+                    <li><strong>Ambulante Pflegedienste:</strong> 9 Organisationen, die häusliche Pflegeleistungen erbringen</li>
+                    <li><strong>Altenheime:</strong> 9 Organisationen, die Pflegeheime und betreutes Wohnen betreiben</li>
+                    <li><strong>Krankenhäuser:</strong> 7 Organisationen, darunter Universitätskliniken und Regionalkrankenhäuser</li>
+                    <li><strong>Sozialberatungsstellen:</strong> 5 Organisationen, die Beratungs- und Unterstützungsleistungen anbieten</li>
+                    <li><strong>Rettungsdienste:</strong> 2 Organisationen (DRK), die Notfallmedizin anbieten</li>
+                    <li><strong>Berufsausbildung:</strong> 3 Organisationen, die auf Gesundheitsbildung spezialisiert sind</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Geografische Verteilung -->
+        <section class="findings-section">
+            <h2 class="section-title">
+                <span class="section-icon">📍</span>
+                Geografische Verteilung
+            </h2>
+            <div class="finding-card">
+                <h3>Konzentration in städtischen Zentren</h3>
+                <p>Die Organisationen sind ungleichmäßig über Thüringen verteilt, mit einer deutlichen Konzentration in den Großstädten:</p>
+                
+                <div class="location-list">
+                    <span class="location-tag">Erfurt <span>(18 Org. - 30,5%)</span></span>
+                    <span class="location-tag">Weimar <span>(7 Org. - 11,9%)</span></span>
+                    <span class="location-tag">Jena <span>(6 Org. - 10,2%)</span></span>
+                    <span class="location-tag">Gera <span>(3 Org. - 5,1%)</span></span>
+                    <span class="location-tag">Rudolstadt <span>(3 Org. - 5,1%)</span></span>
+                    <span class="location-tag">Hildburghausen <span>(2 Org.)</span></span>
+                    <span class="location-tag">Nordhausen <span>(2 Org.)</span></span>
+                    <span class="location-tag">Meiningen <span>(2 Org.)</span></span>
+                    <span class="location-tag">Bad Salzungen <span>(2 Org.)</span></span>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Stadt-Land-Gefälle</h4>
+                    <p>Über 50% der identifizierten Organisationen befinden sich in nur drei Städten (Erfurt, Weimar, Jena), was auf eine potenzielle Lücke in der Pflegeinfrastruktur in ländlichen Gebieten Thüringens hinweist.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wichtige Akteure -->
+        <section class="findings-section">
+            <h2 class="section-title">
+                <span class="section-icon">🏢</span>
+                Wichtige Akteure
+            </h2>
+            <div class="finding-card">
+                <h3>Große Wohlfahrtsverbände</h3>
+                <p>Mehrere große Wohlfahrtsverbände spielen eine zentrale Rolle in der Pflegelandschaft:</p>
+                <ul>
+                    <li><strong>Arbeiterwohlfahrt (AWO):</strong> Mehrere regionale Verbände mit vielfältigen sozialen Dienstleistungen</li>
+                    <li><strong>Deutsches Rotes Kreuz (DRK):</strong> Rettungsdienste und Sozialfürsorge in ganz Thüringen</li>
+                    <li><strong>Diakonie:</strong> Evangelischer Wohlfahrtsverband mit zahlreichen Pflegeeinrichtungen</li>
+                    <li><strong>Caritas:</strong> Katholische Wohlfahrtsdienste einschließlich Altenpflege</li>
+                    <li><strong>Johanniter:</strong> Rettungsdienste und Senioreneinrichtungen</li>
+                    <li><strong>LIGA der Freien Wohlfahrtspflege:</strong> Dachverband zur Koordinierung der Wohlfahrtsanbieter</li>
+                </ul>
+            </div>
+            
+            <div class="finding-card">
+                <h3>Migrationsorientierte Organisationen</h3>
+                <p>Mehrere Organisationen befassen sich speziell mit Migration und Integration:</p>
+                <ul>
+                    <li><strong>MigraNetz Thüringen e.V.:</strong> Netzwerk zur Unterstützung von Migrantengemeinschaften</li>
+                    <li><strong>DaMigra e.V.:</strong> Organisation für Migrantinnen</li>
+                    <li><strong>DGB Hessen-Thüringen:</strong> Gewerkschaft zur Unterstützung von Arbeitnehmerrechten einschließlich Migranten</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Implikationen -->
+        <section class="findings-section">
+            <h2 class="section-title">
+                <span class="section-icon">💡</span>
+                Implikationen für die Rekrutierung von Pflegekräften
+            </h2>
+            <div class="finding-card">
+                <h3>Chancen</h3>
+                <ul>
+                    <li>Starkes Netzwerk etablierter Wohlfahrtsorganisationen bietet potenzielle Einstiegspunkte für internationale Pflegekräfte</li>
+                    <li>Vorhandensein von Berufsbildungseinrichtungen ermöglicht Anerkennung von Qualifikationen und Weiterbildung</li>
+                    <li>Migrationsorientierte Organisationen können als Brücken für Integrationsunterstützung dienen</li>
+                    <li>Vielfältige Dienstleistungsarten bieten verschiedene Karrierewege im Pflegesektor</li>
+                </ul>
+            </div>
+            
+            <div class="finding-card">
+                <h3>Herausforderungen</h3>
+                <ul>
+                    <li>Geografische Konzentration in städtischen Gebieten kann Möglichkeiten in ländlichen Regionen einschränken</li>
+                    <li>Begrenzte Anzahl von Personaldienstleistern (3) deutet auf Abhängigkeit von Direkteinstellungen hin</li>
+                    <li>Bedarf an Koordination zwischen Gesundheitsdienstleistern und Migrationsunterstützungsorganisationen</li>
+                    <li>Potenzielle Sprach- und Kulturbarrieren erfordern gezielte Förderprogramme</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Methodik -->
+        <section class="methodology">
+            <h2>📐 Methodik</h2>
+            <div class="methodology-grid">
+                <div class="methodology-item">
+                    <h4>📅 Datenerhebungszeitraum</h4>
+                    <p>November 2025 — Die Daten wurden durch systematische Recherchen in zwei Primärquellen erhoben.</p>
+                </div>
+                <div class="methodology-item">
+                    <h4>🌐 Quelle 1: Weltoffenes Thüringen</h4>
+                    <p>Demokratiefördernde Initiative mit über 8.000 Mitgliedern. Organisationen gefiltert nach gesundheits- und migrationsbezogenen Stichwörtern.</p>
+                </div>
+                <div class="methodology-item">
+                    <h4>💼 Quelle 2: Bundesagentur für Arbeit</h4>
+                    <p>Stellenportal der Bundesagentur für Arbeit. Suche nach „Pflegefachkraft"-Stellen im Umkreis von 100km um Erfurt.</p>
+                </div>
+                <div class="methodology-item">
+                    <h4>📊 Klassifikationssystem</h4>
+                    <p>Organisationen klassifiziert nach WZ 2008 (Klassifikation der Wirtschaftszweige) — dem deutschen Standard für die Klassifikation wirtschaftlicher Tätigkeiten.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Projekt: Erwartungen auf dem Rekrutierungsweg von Pflegekräften in Thüringen</p>
+            <p>Daten erhoben: November 2025 | Bericht erstellt: Januar 2026</p>
+        </footer>
+    </div>
+
+    <!-- In neuem Tab öffnen -->
+    <button class="open-tab-btn" onclick="window.open(window.location.href, '_blank')" title="In neuem Tab öffnen">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a0a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+    </button>
+</body>
+</html>

@@ -50,48 +50,144 @@ care_workers_load_orgs <- function() {
   df
 }
 
-care_workers_load_analysis <- function() {
-  path <- file.path(care_workers_data_dir(), "analysis_data.json")
-  jsonlite::fromJSON(path, simplifyVector = TRUE)
-}
-
 care_workers_theme_color <- function(theme) {
   out <- CARE_THEME_COLORS[as.character(theme)]
   out[is.na(out)] <- CARE_THEME_COLORS["Unknown"]
   unname(out)
 }
 
-care_workers_viz_links <- function() {
-  list(
+care_workers_load_analysis <- function() {
+  path <- file.path(care_workers_data_dir(), "analysis_data.json")
+  jsonlite::fromJSON(path, simplifyVector = TRUE)
+}
+
+#' Convert JSON named count objects (list) to a two-column data frame.
+care_workers_named_counts <- function(x) {
+  if (is.null(x) || !length(x)) {
+    return(data.frame(name = character(), count = integer(), stringsAsFactors = FALSE))
+  }
+  data.frame(
+    name = names(x),
+    count = vapply(x, function(v) as.integer(v), integer(1)),
+    stringsAsFactors = FALSE
+  )
+}
+
+care_workers_L <- function(lang, en, de) {
+  if (identical(lang, "de")) de else en
+}
+
+care_workers_theme_label <- function(theme, lang = "en") {
+  de <- c(
+    "Transnational Recruitment" = "Transnationale Rekrutierung",
+    "Worker Suitability" = "Eignung der Fachkr\u00e4fte",
+    "Pre-Arrival Expectations" = "Erwartungen vor Ankunft",
+    "Extended Support" = "Erweiterte Unterst\u00fctzung",
+    "Qualification Mismatches" = "Qualifikations-Diskrepanzen",
+    "Adverse Outcomes" = "Negative Verl\u00e4ufe",
+    "Unknown" = "Unbekannt"
+  )
+  th <- as.character(theme)
+  if (identical(lang, "de")) {
+    out <- de[th]
+    out[is.na(out)] <- th[is.na(out)]
+    return(unname(out))
+  }
+  th
+}
+
+care_workers_sector_label <- function(sector, lang = "en") {
+  de <- c(
+    "Health & social work" = "Gesundheit & Soziales",
+    "Education" = "Bildung",
+    "Advocacy & services" = "Advocacy & Dienste",
+    "Other" = "Sonstige"
+  )
+  s <- as.character(sector)
+  if (identical(lang, "de")) {
+    out <- de[s]
+    out[is.na(out)] <- s[is.na(out)]
+    return(unname(out))
+  }
+  s
+}
+
+care_workers_keyword_label <- function(name, lang = "en") {
+  de <- c(
+    Language = "Sprache",
+    Bureaucracy = "B\u00fcrokratie",
+    Integration = "Integration",
+    Retention = "Bindung / Fluktuation",
+    Discrimination = "Diskriminierung",
+    `Proactive Support` = "Proaktive Unterst\u00fctzung",
+    `Reactive/Acknowledgment` = "Reaktiv / Anerkennung",
+    `Structural/Systemic` = "Strukturell / Systemisch"
+  )
+  n <- as.character(name)
+  if (identical(lang, "de")) {
+    out <- de[n]
+    out[is.na(out)] <- n[is.na(out)]
+    return(unname(out))
+  }
+  n
+}
+
+care_workers_viz_links <- function(lang = "en") {
+  links <- list(
     list(
       file = "interview_insights_dashboard.html",
-      title = "Interview insights",
-      desc = "Theme radar, stakeholder profiles, coded entry explorer."
+      file_de = "interview_insights_dashboard.html",
+      title_en = "Interview insights",
+      title_de = "Interview-Einblicke",
+      desc_en = "Theme radar, stakeholder profiles, coded entry explorer.",
+      desc_de = "Themen-Radar, Stakeholder-Profile, codierte Textstellen."
     ),
     list(
       file = "consolidated_dashboard.html",
-      title = "Organizations map",
-      desc = "59 Thuringia orgs — map, sector charts, WZ classification."
+      file_de = "consolidated_dashboard:de.html",
+      title_en = "Organizations map",
+      title_de = "Organisationskarte",
+      desc_en = "59 Thuringia orgs \u2014 map, sector charts, WZ classification.",
+      desc_de = "59 Organisationen \u2014 Karte, Branchen, WZ-Klassifikation."
     ),
     list(
       file = "network_dashboard.html",
-      title = "Network view",
-      desc = "Relationships between organizations and service types."
+      file_de = "network_dashboard:de.html",
+      title_en = "Network view",
+      title_de = "Netzwerk-Ansicht",
+      desc_en = "Relationships between organizations and service types.",
+      desc_de = "Beziehungen zwischen Organisationen und Leistungen."
     ),
     list(
       file = "quotations_by_theme.html",
-      title = "Quotations by theme",
-      desc = "Qualitative extracts grouped by research theme."
+      file_de = "quotations_by_theme.html",
+      title_en = "Quotations by theme",
+      title_de = "Zitate nach Thema",
+      desc_en = "Qualitative extracts grouped by research theme.",
+      desc_de = "Qualitative Textstellen nach Forschungsthema."
     ),
     list(
       file = "findings.html",
-      title = "Key findings",
-      desc = "Executive summary of recruitment pathways."
+      file_de = "findings:de.html",
+      title_en = "Key findings",
+      title_de = "Kernergebnisse",
+      desc_en = "Executive summary of recruitment pathways.",
+      desc_de = "Zusammenfassung der Rekrutierungswege."
     ),
     list(
       file = "metadata_viewer.html",
-      title = "Metadata viewer",
-      desc = "Project structure and data dictionary."
+      file_de = "metadata_viewer:de.html",
+      title_en = "Metadata viewer",
+      title_de = "Metadaten-Viewer",
+      desc_en = "Project structure and data dictionary.",
+      desc_de = "Projektstruktur und Datenw\u00f6rterbuch."
     )
   )
+  lapply(links, function(x) {
+    list(
+      file = if (identical(lang, "de")) x$file_de else x$file,
+      title = if (identical(lang, "de")) x$title_de else x$title_en,
+      desc = if (identical(lang, "de")) x$desc_de else x$desc_en
+    )
+  })
 }
