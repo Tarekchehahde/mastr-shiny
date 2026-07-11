@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>IG Metall Mitte — Demonstrationen</title>
+  <style>
+    :root {
+      --igm-red: #e30613;
+      --bg: #0b1020;
+      --card: #121a2f;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(227, 6, 19, 0.18) 0%, var(--bg) 55%);
+      color: var(--text);
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px solid var(--igm-red);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .brand:hover { text-decoration: none; }
+    .brand img { height: 44px; width: auto; }
+    .brand strong { display: block; font-size: 1rem; }
+    .brand span { display: block; font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
+    .back { font-size: 0.82rem; color: #93c5fd; text-decoration: none; }
+    .back:hover { text-decoration: underline; }
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+    .intro {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      max-width: 40rem;
+      margin-bottom: 1rem;
+    }
+    .notice {
+      margin: 1rem 0 1.5rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      color: #fde68a;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+    .notice strong { color: #fcd34d; }
+    .live {
+      margin-bottom: 1.5rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid rgba(96, 165, 250, 0.28);
+      color: #bfdbfe;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.35rem 1.4rem;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    a.card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(227, 6, 19, 0.55);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      text-decoration: none;
+    }
+    .card-icon { font-size: 1.75rem; margin-bottom: 0.6rem; }
+    .card h2 { font-size: 1.1rem; margin: 0 0 0.35rem; }
+    .card p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
+    .badge {
+      display: inline-block;
+      margin-top: 0.75rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(227, 6, 19, 0.15);
+      color: #fca5a5;
+    }
+    .url-note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .url-note code {
+      color: #93c5fd;
+      background: rgba(148, 163, 184, 0.1);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+    }
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    footer a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="brand" href="/portal/igmetall/">
+        <img src="/demo/igmetall-mitte-factory/assets/igmetall-logo.svg" alt="IG Metall Logo"/>
+        <div>
+          <strong>IG Metall Mitte</strong>
+          <span>Demonstrationsplattform · Proof-of-Concept</span>
+        </div>
+      </a>
+      <a class="back" href="/portal/">← Mission Control</a>
+    </div>
+
+    <h1>Demonstrationen</h1>
+    <p class="intro">
+      Zwei interaktive Demo-Dashboards für IG Metall Mitte — Konzept, Umsetzung und Hosting:
+      <strong>Tarek Chehade</strong>.
+    </p>
+
+    <p class="live">
+      <strong>Live &amp; teilbar:</strong> Alle Demos sind öffentlich im Internet erreichbar.
+      Die Links unten bleiben unverändert und können frei weitergegeben werden.
+    </p>
+
+    <p class="notice">
+      <strong>Rechtlicher Hinweis:</strong> Alle dargestellten Daten sind fiktiv und dienen ausschließlich Demonstrationszwecken.
+      Keine offizielle Publikation der IG Metall. Gehostet auf dem privaten Demo-Server von Tarek Chehade —
+      es werden keine echten Personaldaten verarbeitet oder gespeichert.
+    </p>
+
+    <div class="grid">
+      <a class="card" href="/demo/igmetall-mitte-factory/">
+        <div class="card-icon">🏭</div>
+        <h2>Werksgelände — Mitgliedschaftsübersicht</h2>
+        <p>Isometrische Eagle-Eye-Ansicht mit interaktiven Gebäudemarkierungen: Beschäftigte, IG-Metall-Mitglieder und Organisationspotenzial pro Gebäude.</p>
+        <span class="badge">Proof-of-Concept</span>
+      </a>
+      <a class="card" href="/demo/igmetall-mitte-demographics/">
+        <div class="card-icon">📊</div>
+        <h2>Mitarbeiter-Demografie</h2>
+        <p>Belegschaftsanalyse: Altersverteilung, Positionen, Betriebszugehörigkeit und Geschlecht nach Abteilung — interaktive Charts.</p>
+        <span class="badge">Proof-of-Concept</span>
+      </a>
+    </div>
+
+    <p class="url-note">
+      Direktlinks (unverändert):<br/>
+      Werksgelände — <code>/demo/igmetall-mitte-factory/</code><br/>
+      Demografie — <code>/demo/igmetall-mitte-demographics/</code>
+    </p>
+
+    <footer>
+      Konzept, Umsetzung &amp; Hosting: <strong style="color:#fff">Tarek Chehade</strong> ·
+      <a href="/about/">Profil</a> ·
+      <a href="/">Dashboard Hub</a> ·
+      <a href="https://www.igmetall.de/" target="_blank" rel="noopener">igmetall.de</a>
+    </footer>
+  </div>
+</body>
+</html>

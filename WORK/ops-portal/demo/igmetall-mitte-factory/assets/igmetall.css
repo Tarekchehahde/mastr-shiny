@@ -92,6 +92,32 @@ a:hover { text-decoration: underline; }
   border-color: rgba(74, 222, 128, 0.35);
 }
 
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .nav-links { display: none; }
+}
+
 .author-credit {
   margin: 0 0 0.5rem;
   font-size: 0.82rem;

@@ -193,6 +193,45 @@
       vertical-align: middle;
       animation: twinkle 1.6s ease-in-out infinite;
     }
+    .badge-igm {
+      background: rgba(227, 6, 19, 0.18);
+      color: #fca5a5;
+    }
+
+    section.section-igmetall {
+      margin-top: 2.5rem;
+      padding: 1.25rem;
+      border-radius: 16px;
+      border: 1px solid rgba(227, 6, 19, 0.28);
+      background: linear-gradient(145deg, rgba(227, 6, 19, 0.08), rgba(18, 26, 47, 0.6));
+    }
+    section.section-igmetall h3 {
+      color: #fecaca;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+    section.section-igmetall h3 img {
+      height: 28px;
+      width: auto;
+    }
+    section.section-igmetall .section-intro {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin: -0.35rem 0 1rem;
+      line-height: 1.5;
+      max-width: 42rem;
+    }
+    section.section-igmetall .section-intro a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+    section.section-igmetall .section-intro a:hover { text-decoration: underline; }
+    section.section-igmetall a.card:hover {
+      border-color: rgba(227, 6, 19, 0.65);
+      box-shadow: 0 22px 60px rgba(0,0,0,.55), 0 0 40px rgba(227, 6, 19, 0.15);
+    }
 
     section { margin-top: 2.5rem; }
     section h3 {
@@ -256,21 +295,35 @@
       </div>
     </section>
 
-    <section>
-      <h3>Pitch demos</h3>
+    <section class="section-igmetall">
+      <h3>
+        <img src="/demo/igmetall-mitte-factory/assets/igmetall-logo.svg" alt=""/>
+        IG Metall demonstrations
+      </h3>
+      <p class="section-intro">
+        Proof-of-concept demos for IG Metall Mitte — fictional data, hosted by Tarek Chehade.
+        Direct demo URLs stay unchanged for existing users.
+        <a href="/portal/igmetall/">Open IG Metall demo hub →</a>
+      </p>
       <div class="grid">
         <a class="card" href="/demo/igmetall-mitte-factory/">
           <div class="card-icon">🏭</div>
           <h2>IG Metall Mitte — Werksgelände</h2>
-          <p>Interaktives Luftbild mit Gebäudemarkierungen — Beschäftigte, IG-Metall-Mitglieder, Organisationsgrad (Demo).</p>
-          <span class="badge badge-public">Proof-of-Concept</span>
+          <p>Isometric eagle-eye view with building markers — employees, IG Metall members, organizing rate (demo).</p>
+          <span class="badge badge-igm">Proof-of-Concept</span>
         </a>
         <a class="card" href="/demo/igmetall-mitte-demographics/">
           <div class="card-icon">📊</div>
           <h2>IG Metall Mitte — Demografie</h2>
-          <p>Belegschaftsanalyse: Alter, Position, Betriebszugehörigkeit, Geschlecht nach Abteilung (Demo).</p>
-          <span class="badge badge-public">Proof-of-Concept</span>
+          <p>Workforce analysis: age, role, tenure, gender by department — interactive charts (demo).</p>
+          <span class="badge badge-igm">Proof-of-Concept</span>
         </a>
+      </div>
+    </section>
+
+    <section>
+      <h3>Pitch demos</h3>
+      <div class="grid">
         <a class="card" href="/demo/ccs-ops-pulse/">
           <div class="card-icon">🍽</div>
           <h2>CCS Ops Pulse</h2>
@@ -390,7 +443,7 @@
       }
 
       // Reveal sections/cards as they scroll into view, staggered per grid.
-      var targets = document.querySelectorAll('a.card, section h3');
+      var targets = document.querySelectorAll('a.card, section h3, section.section-igmetall h3');
       if (reduced || !('IntersectionObserver' in window)) {
         targets.forEach(function (el) { el.classList.add('in-view'); });
         return;
