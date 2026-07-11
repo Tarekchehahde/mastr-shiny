@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "title": "Daten Fakten Informationen 2026",
+    "source_note": "Struktur und Kennzahlen orientieren sich an öffentlich zugänglichen IG-Metall-Tarifinformationen (DFI / Tariftabellen). Diese Demo ist keine offizielle Publikation.",
+    "updated": "2026-07-11"
+  },
+  "kpis": {
+    "avg_handwerk_increase_pct": 5.2,
+    "me_industry_2026_pct": 3.1,
+    "agreements_count": 18,
+    "avg_duration_months": 22
+  },
+  "sector_comparison": {
+    "labels": ["Metall & Elektro (Industrie)", "Handwerk (Ø)", "SHK-Handwerk", "Metallhandwerk", "Kfz-Handwerk"],
+    "values": [5.1, 5.2, 5.5, 4.9, 6.2]
+  },
+  "duration_distribution": {
+    "labels": ["12 Mon.", "18 Mon.", "21 Mon.", "24 Mon.", "27 Mon.", "30 Mon."],
+    "values": [2, 3, 4, 6, 2, 1]
+  },
+  "agreements": [
+    {
+      "sector": "Metall- und Elektroindustrie",
+      "region": "Bundesweit",
+      "type": "Industrie",
+      "effective": "2025-04-01",
+      "increase_pct": 2.0,
+      "bonus": "600 € Sonderzahlung",
+      "duration_months": 24
+    },
+    {
+      "sector": "Metall- und Elektroindustrie",
+      "region": "Bundesweit",
+      "type": "Industrie",
+      "effective": "2026-04-01",
+      "increase_pct": 3.1,
+      "bonus": "—",
+      "duration_months": 24
+    },
+    {
+      "sector": "Metallverarbeitendes Handwerk",
+      "region": "Baden-Württemberg",
+      "type": "Handwerk",
+      "effective": "2025-07-01",
+      "increase_pct": 2.0,
+      "bonus": "ZUB 651,50 €",
+      "duration_months": 24
+    },
+    {
+      "sector": "Metallverarbeitendes Handwerk",
+      "region": "Baden-Württemberg",
+      "type": "Handwerk",
+      "effective": "2026-07-01",
+      "increase_pct": 3.1,
+      "bonus": "ZUB 952 €",
+      "duration_months": 24
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Nordrhein-Westfalen",
+      "type": "Handwerk",
+      "effective": "2026-03-01",
+      "increase_pct": 2.8,
+      "bonus": "VWL-Verbesserung",
+      "duration_months": 24
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Nordrhein-Westfalen",
+      "type": "Handwerk",
+      "effective": "2027-03-01",
+      "increase_pct": 2.9,
+      "bonus": "—",
+      "duration_months": 24
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Hessen",
+      "type": "Handwerk",
+      "effective": "2026-01-01",
+      "increase_pct": 2.9,
+      "bonus": "—",
+      "duration_months": 21
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Bremen",
+      "type": "Handwerk",
+      "effective": "2026-01-01",
+      "increase_pct": 2.6,
+      "bonus": "—",
+      "duration_months": 24
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Bremen",
+      "type": "Handwerk",
+      "effective": "2027-01-01",
+      "increase_pct": 2.9,
+      "bonus": "—",
+      "duration_months": 24
+    },
+    {
+      "sector": "Metallhandwerk",
+      "region": "Rheinland-Rheinhessen",
+      "type": "Handwerk",
+      "effective": "2026-04-01",
+      "increase_pct": 2.8,
+      "bonus": "Azubi-Festbetrag",
+      "duration_months": 24
+    },
+    {
+      "sector": "Metallverarbeitendes Handwerk",
+      "region": "Sachsen-Anhalt",
+      "type": "Handwerk",
+      "effective": "2026-01-01",
+      "increase_pct": 2.7,
+      "bonus": "—",
+      "duration_months": 18
+    },
+    {
+      "sector": "Metallverarbeitendes Handwerk",
+      "region": "Sachsen-Anhalt",
+      "type": "Handwerk",
+      "effective": "2026-07-01",
+      "increase_pct": 2.5,
+      "bonus": "—",
+      "duration_months": 18
+    },
+    {
+      "sector": "Metallverarbeitendes Handwerk / Landbautechnik",
+      "region": "Niedersachsen & Bremen",
+      "type": "Handwerk",
+      "effective": "2026-01-01",
+      "increase_pct": 2.9,
+      "bonus": "Mitgliederbonus Heiligabend/Silvester",
+      "duration_months": 24
+    },
+    {
+      "sector": "Kfz-Handwerk",
+      "region": "Bayern",
+      "type": "Handwerk",
+      "effective": "2025-01-01",
+      "increase_pct": 6.2,
+      "bonus": "Azubi +60–70 €",
+      "duration_months": 27
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Schleswig-Holstein",
+      "type": "Handwerk",
+      "effective": "2026-05-01",
+      "increase_pct": 2.6,
+      "bonus": "—",
+      "duration_months": 24
+    },
+    {
+      "sector": "SHK-Handwerk",
+      "region": "Schleswig-Holstein",
+      "type": "Handwerk",
+      "effective": "2027-05-01",
+      "increase_pct": 2.8,
+      "bonus": "—",
+      "duration_months": 24
+    },
+    {
+      "sector": "Leiharbeit (Metall/Elektro)",
+      "region": "Bundesweit",
+      "type": "Industrie",
+      "effective": "2025-01-01",
+      "increase_pct": 2.99,
+      "bonus": "—",
+      "duration_months": 12
+    },
+    {
+      "sector": "Eisen- und Stahlindustrie",
+      "region": "Nordwest / Ost",
+      "type": "Industrie",
+      "effective": "2025-07-01",
+      "increase_pct": 5.0,
+      "bonus": "—",
+      "duration_months": 24
+    }
+  ]
+}

@@ -75,6 +75,16 @@ DASHBOARDS <- list(
     href = "/demo/igmetall-mitte-demographics/"
   ),
   list(
+    id = "igmetall_mitte_dfi",
+    title = "IG Metall Mitte \u2014 DFI 2026",
+    badge = "Pitch",
+    badge_class = "bg-danger",
+    badge_style = "background-color: #e30613 !important;",
+    desc = "Daten Fakten Informationen 2026 digital: Tariferh\u00f6hungen, Laufzeiten, durchsuchbare Abschl\u00fcsse \u2014 Proof-of-Concept f\u00fcr IG Metall Mitte (Tarek Chehade).",
+    highlight = FALSE,
+    href = "/demo/igmetall-mitte-dfi/"
+  ),
+  list(
     id = "dummy_demo",
     title = "Demo Dashboard",
     badge = "Test",

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="IG Metall Mitte — DFI 2026 Tarif-Dashboard Demo · Proof-of-Concept"/>
+  <title>IG Metall — DFI 2026 Demo</title>
+  <link rel="stylesheet" href="/demo/igmetall-mitte-dfi/assets/shell.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            igm: { DEFAULT: "#e30613", dark: "#b0050f" }
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/demo/igmetall-mitte-dfi/">
+      <img src="/demo/igmetall-mitte-dfi/assets/igmetall-logo.svg" alt="IG Metall Logo"/>
+      <div class="brand-text">
+        <strong>DFI 2026 — Tarifdaten</strong>
+        <span>Proof-of-Concept · IG Metall Mitte · Demo</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="/portal/igmetall/">Alle IG-Metall-Demos</a>
+      <a href="/demo/igmetall-mitte-factory/">Werksgelände</a>
+      <a href="/demo/igmetall-mitte-demographics/">Demografie</a>
+    </div>
+    <span class="nav-badge-live">Live · Öffentlich</span>
+  </nav>
+
+  <header class="hero">
+    <p class="author-credit">Konzept, Umsetzung &amp; Hosting: <strong>Tarek Chehade</strong></p>
+    <h1>IG Metall – Daten Fakten Informationen 2026</h1>
+    <p class="sub">Digital Dashboard — zentrale Tarifdaten, Abschlüsse und Laufzeiten für Metall-, Elektro- und Handwerksbranchen im Organisationsbereich der IG Metall. Struktur orientiert an der DFI-Broschüre (FB Tarifpolitik und Handwerk).</p>
+    <p class="live-notice">
+      <strong>Live-Demo:</strong> Diese Ansicht läuft auf meinem privaten Server und ist öffentlich im Internet erreichbar.
+      Sie können den Link frei weitergeben — jede Person mit dem Link kann die Demo ansehen.
+    </p>
+    <p class="disclaimer">
+      <strong>Rechtlicher Hinweis:</strong> Dies ist ein Proof-of-Concept für IG Metall Mitte — keine offizielle Publikation der IG Metall.
+      Die Demo visualisiert öffentlich zugängliche Tarifparameter in strukturierter Form; sie ersetzt nicht die offizielle DFI-Broschüre im Mitgliederbereich.
+      Gehostet auf dem privaten Demo-Server von Tarek Chehade — es werden keine personenbezogenen Daten verarbeitet oder gespeichert.
+      · Stand 2026-07-11
+    </p>
+  </header>
+
+  <div class="bg-slate-100 text-slate-900">
+    <!-- KPI strip -->
+    <div class="bg-igm border-b-4 border-igm-dark">
+      <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4">
+        <div class="px-4 py-5 text-center border-r border-white/20">
+          <div id="kpi-handwerk" class="text-3xl md:text-4xl font-extrabold text-white">—</div>
+          <div class="text-xs uppercase tracking-wider text-white/85 mt-1">Ø Erhöhung Handwerk</div>
+        </div>
+        <div class="px-4 py-5 text-center border-r border-white/20">
+          <div id="kpi-me" class="text-3xl md:text-4xl font-extrabold text-white">—</div>
+          <div class="text-xs uppercase tracking-wider text-white/85 mt-1">M+E Stufe 2026</div>
+        </div>
+        <div class="px-4 py-5 text-center border-r border-white/20">
+          <div id="kpi-count" class="text-3xl md:text-4xl font-extrabold text-white">—</div>
+          <div class="text-xs uppercase tracking-wider text-white/85 mt-1">Tarifabschlüsse (Demo)</div>
+        </div>
+        <div class="px-4 py-5 text-center">
+          <div id="kpi-duration" class="text-3xl md:text-4xl font-extrabold text-white">—</div>
+          <div class="text-xs uppercase tracking-wider text-white/85 mt-1">Ø Vertragslaufzeit</div>
+        </div>
+      </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+      <p id="load-error" hidden class="rounded-lg bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 text-sm">
+        Daten konnten nicht geladen werden. Bitte Seite neu laden.
+      </p>
+      <p id="source-note" class="text-sm text-slate-500 max-w-3xl"></p>
+
+      <!-- Charts -->
+      <section class="grid md:grid-cols-2 gap-6">
+        <article class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+          <div class="bg-slate-900 text-white px-5 py-3 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-igm"></span>
+            <h2 class="text-sm font-semibold">Tariferhöhungen nach Sektor</h2>
+          </div>
+          <div class="p-4 h-72 md:h-80">
+            <canvas id="sectorChart"></canvas>
+          </div>
+        </article>
+        <article class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+          <div class="bg-slate-900 text-white px-5 py-3 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-igm"></span>
+            <h2 class="text-sm font-semibold">Verteilung Vertragslaufzeiten</h2>
+          </div>
+          <div class="p-4 h-72 md:h-80">
+            <canvas id="durationChart"></canvas>
+          </div>
+        </article>
+      </section>
+
+      <hr class="border-slate-300"/>
+
+      <!-- Table -->
+      <section class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-900 text-white px-5 py-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-igm"></span>
+          <h2 class="text-sm font-semibold">Tarifabschlüsse — Übersicht</h2>
+        </div>
+        <div class="p-4 border-b border-slate-200 bg-slate-50">
+          <label for="table-search" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">
+            Suche Branche, Region oder Typ
+          </label>
+          <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <input
+              id="table-search"
+              type="search"
+              placeholder="z. B. Handwerk, SHK, Baden-Württemberg, Industrie…"
+              class="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-igm/30 focus:border-igm"
+            />
+            <span id="result-count" class="text-sm text-slate-500 whitespace-nowrap">— Einträge</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[760px]">
+            <thead class="bg-slate-100 text-left text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">Branche</th>
+                <th class="px-4 py-3 font-semibold">Region / Gebiet</th>
+                <th class="px-4 py-3 font-semibold">Typ</th>
+                <th class="px-4 py-3 font-semibold">Wirksam ab</th>
+                <th class="px-4 py-3 font-semibold">Erhöhung</th>
+                <th class="px-4 py-3 font-semibold">Einmalzahlung / ZUB</th>
+                <th class="px-4 py-3 font-semibold">Laufzeit</th>
+              </tr>
+            </thead>
+            <tbody id="tariff-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="text-xs text-slate-500 leading-relaxed max-w-3xl">
+        Referenz: öffentliche IG-Metall-Tarifinformationen u. a.
+        <a class="text-red-700 underline" href="https://www.igmetall.de/tarif/tariftabellen/dfi---tarifdaten-und-abschluesse" target="_blank" rel="noopener">DFI — Tarifdaten und Abschlüsse</a>,
+        <a class="text-red-700 underline" href="https://www.igmetall.de/tarif/tariftabellen/metall-und-elektroindustrie" target="_blank" rel="noopener">Metall- und Elektroindustrie</a>,
+        <a class="text-red-700 underline" href="https://www.igmetall.de/tarif/tarifrunden/tarifabschluesse-handwerk-branchen-uebersicht" target="_blank" rel="noopener">Handwerk — Branchenübersicht</a>.
+        Demo-Dashboard — nicht zur Rechtsberatung geeignet.
+      </p>
+    </main>
+  </div>
+
+  <p class="footer-note">
+    Konzept, Umsetzung &amp; Hosting: <strong>Tarek Chehade</strong> ·
+    <a href="/about/">Profil &amp; Kontakt</a> ·
+    <a href="/portal/igmetall/">IG Metall Demo-Hub</a> ·
+    Kein offizielles IG-Metall-Produkt ·
+    Öffentliche Live-Demo — Link frei teilbar ·
+    <a href="https://www.igmetall.de/" target="_blank" rel="noopener">igmetall.de</a>
+  </p>
+
+  <script src="/demo/igmetall-mitte-dfi/assets/dfi.js"></script>
+</body>
+</html>
