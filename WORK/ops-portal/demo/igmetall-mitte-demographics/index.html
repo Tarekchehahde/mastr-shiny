@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="IG Metall Mitte — Mitarbeiter-Demografie Demo · Proof-of-Concept"/>
+  <title>IG Metall Mitte — Mitarbeiter-Demografie Demo</title>
+  <link rel="stylesheet" href="/demo/igmetall-mitte-demographics/assets/demographics.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/demo/igmetall-mitte-demographics/">
+      <img src="/demo/igmetall-mitte-demographics/assets/igmetall-logo.svg" alt="IG Metall Logo"/>
+      <div class="brand-text">
+        <strong>Mitarbeiter-Demografie</strong>
+        <span>Proof-of-Concept · IG Metall Mitte · Demo</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="/demo/igmetall-mitte-factory/">Werksgelände</a>
+      <a href="/">Dashboard Hub</a>
+    </div>
+    <span class="nav-badge-live">Live · Öffentlich</span>
+  </nav>
+
+  <header class="hero">
+    <p class="author-credit">Konzept, Umsetzung &amp; Hosting: <strong>Tarek Chehade</strong></p>
+    <h1>Belegschaftsanalyse — Demografische Übersicht</h1>
+    <p class="sub">Altersverteilung, Positionen, Betriebszugehörigkeit und Geschlecht nach Abteilung — interaktive Charts auf Basis fiktiver Beispieldaten.</p>
+    <p class="live-notice">
+      <strong>Live-Demo:</strong> Diese Ansicht läuft auf meinem privaten Server und ist öffentlich im Internet erreichbar.
+      Sie können den Link frei weitergeben — jede Person mit dem Link kann die Demo ansehen.
+    </p>
+    <p class="disclaimer">
+      <strong>Rechtlicher Hinweis:</strong> Alle dargestellten Daten sind fiktiv und dienen ausschließlich Demonstrationszwecken.
+      Dieses Dashboard ist ein Proof-of-Concept für IG Metall Mitte und stellt keine echten Betriebs-, Personal- oder Gewerkschaftsdaten dar.
+      Keine offizielle Publikation der IG Metall. Gehostet auf dem privaten Demo-Server von Tarek Chehade — es werden keine echten Personaldaten verarbeitet oder gespeichert.
+      · Stand 2026-07-11
+    </p>
+  </header>
+
+  <div class="dashboard-shell">
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-value">370</div>
+        <div class="kpi-label">Mitarbeiter gesamt</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">41,3</div>
+        <div class="kpi-label">Ø Alter (Jahre)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">58 %</div>
+        <div class="kpi-label">Männlich / 42 % Weiblich</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">8,4</div>
+        <div class="kpi-label">Ø Betriebszugehörigkeit</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">7</div>
+        <div class="kpi-label">Abteilungen</div>
+      </div>
+    </div>
+
+    <main class="dashboard-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="dot"></div>
+          <h2>Altersverteilung</h2>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="ageChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot"></div>
+          <h2>Positionsverteilung</h2>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="positionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot"></div>
+          <h2>Betriebszugehörigkeit</h2>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="tenureChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot"></div>
+          <h2>Geschlecht nach Abteilung</h2>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="genderChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-wide">
+        <div class="card-header">
+          <div class="dot"></div>
+          <h2>Belegschaftsübersicht</h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="big">145</div>
+            <div class="label">Produktion</div>
+            <div class="sub">39 % der Belegschaft</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">72</div>
+            <div class="label">Ingenieure</div>
+            <div class="sub">19 % der Belegschaft</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">22 %</div>
+            <div class="label">Unter 35 Jahre</div>
+            <div class="sub">82 Mitarbeiter</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">34 %</div>
+            <div class="label">Über 50 Jahre</div>
+            <div class="sub">126 Mitarbeiter</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">18</div>
+            <div class="label">Auszubildende</div>
+            <div class="sub">Ø Alter: 21 Jahre</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">25</div>
+            <div class="label">Führungskräfte</div>
+            <div class="sub">7 % der Belegschaft</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">63 %</div>
+            <div class="label">Vollzeit</div>
+            <div class="sub">233 Mitarbeiter</div>
+          </div>
+          <div class="stat-box">
+            <div class="big">12,1</div>
+            <div class="label">Ø Zugehörigkeit Prod.</div>
+            <div class="sub">Höchstwert aller Abt.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <p class="footer-note">
+    Konzept, Umsetzung &amp; Hosting: <strong>Tarek Chehade</strong> ·
+    <a href="/about/">Profil &amp; Kontakt</a> ·
+    Kein offizielles IG-Metall-Produkt ·
+    Öffentliche Live-Demo — Link frei teilbar ·
+    Alle Kennzahlen sind fiktiv ·
+    <a href="/demo/igmetall-mitte-factory/">Werksgelände-Demo</a> ·
+    <a href="https://www.igmetall.de/" target="_blank" rel="noopener">igmetall.de</a>
+  </p>
+
+  <script src="/demo/igmetall-mitte-demographics/assets/demographics.js"></script>
+</body>
+</html>

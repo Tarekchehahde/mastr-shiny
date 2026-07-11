@@ -65,6 +65,16 @@ DASHBOARDS <- list(
     href = "/demo/igmetall-mitte-factory/"
   ),
   list(
+    id = "igmetall_mitte_demographics",
+    title = "IG Metall Mitte \u2014 Demografie",
+    badge = "Pitch",
+    badge_class = "bg-danger",
+    badge_style = "background-color: #e30613 !important;",
+    desc = "Belegschaftsanalyse: Alter, Position, Betriebszugeh\u00f6rigkeit und Geschlecht nach Abteilung \u2014 interaktive Charts, Proof-of-Concept f\u00fcr IG Metall Mitte (Tarek Chehade). Fiktive Demo-Daten.",
+    highlight = FALSE,
+    href = "/demo/igmetall-mitte-demographics/"
+  ),
+  list(
     id = "dummy_demo",
     title = "Demo Dashboard",
     badge = "Test",
