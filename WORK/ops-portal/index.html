@@ -232,6 +232,12 @@
       border-color: rgba(227, 6, 19, 0.65);
       box-shadow: 0 22px 60px rgba(0,0,0,.55), 0 0 40px rgba(227, 6, 19, 0.15);
     }
+    /* IG Metall platform: always visible (no scroll-reveal hide) */
+    section.section-igmetall h3,
+    section.section-igmetall a.card {
+      opacity: 1;
+      transform: none;
+    }
 
     section { margin-top: 2.5rem; }
     section h3 {
@@ -295,7 +301,7 @@
       </div>
     </section>
 
-    <section class="section-igmetall">
+    <section class="section-igmetall" id="igmetall">
       <h3>
         <img src="/demo/igmetall-mitte-factory/assets/igmetall-logo.svg" alt=""/>
         IG Metall demonstrations
@@ -375,7 +381,7 @@
       </div>
     </section>
 
-    <section>
+    <section id="ml">
       <h3>Development &amp; ML</h3>
       <div class="grid">
         <a class="card" href="http://82.165.167.86:8787/" target="_blank" rel="noopener">
@@ -462,6 +468,29 @@
         });
       }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
       targets.forEach(function (el) { io.observe(el); });
+
+      // Reveal anything already on screen (avoids invisible cards if IO misses first paint).
+      function revealVisible() {
+        targets.forEach(function (el) {
+          var r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight * 0.94 && r.bottom > 0) {
+            el.classList.add('in-view');
+          }
+        });
+      }
+      revealVisible();
+      window.addEventListener('load', revealVisible);
+
+      // Hash anchors: /portal/#igmetall, /portal/#ml, etc.
+      function scrollToHash() {
+        if (!location.hash) return;
+        var target = document.querySelector(location.hash);
+        if (target) {
+          target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        }
+      }
+      scrollToHash();
+      window.addEventListener('hashchange', scrollToHash);
     })();
   </script>
 </body>
